@@ -1,11 +1,11 @@
 {
   "projectType": "general",
-  "projectName": "Nvim Luffy",
-  "projectDescription": "A modern, feature-rich Neovim configuration built with Lazy.nvim and LSP support",
-  "theme": "aspen",
-  "primaryColor": "#FF6B6B",
-  "lightColor": "#FFE66D",
-  "darkColor": "#4ECDC4",
+  "projectName": "nvim-luffy",
+  "projectDescription": "A modern, modular Neovim configuration with LSP, fuzzy finding, and developer-friendly keybindings",
+  "theme": "palm",
+  "primaryColor": "#e63946",
+  "lightColor": "#f77f00",
+  "darkColor": "#d62828",
   "navigation": {
     "groups": [
       {
@@ -17,37 +17,28 @@
         ]
       },
       {
-        "group": "Configuration",
+        "group": "Core Configuration",
         "pages": [
-          "configuration/overview",
-          "configuration/options",
-          "configuration/keymaps",
-          "configuration/autocommands"
+          "core/options",
+          "core/keymaps",
+          "core/autocommands"
         ]
       },
       {
         "group": "Plugins",
         "pages": [
           "plugins/overview",
-          "plugins/lsp",
-          "plugins/telescope",
-          "plugins/harpoon",
-          "plugins/nvim-tree",
-          "plugins/treesitter",
-          "plugins/completion",
           "plugins/colorschemes",
+          "plugins/telescope",
+          "plugins/nvim-tree",
+          "plugins/harpoon",
+          "plugins/alpha",
+          "plugins/lsp",
+          "plugins/completion",
+          "plugins/formatting",
           "plugins/git",
-          "plugins/utilities"
-        ]
-      },
-      {
-        "group": "LSP & Development",
-        "pages": [
-          "lsp/overview",
-          "lsp/mason",
-          "lsp/keybindings",
-          "lsp/diagnostics",
-          "lsp/formatting"
+          "plugins/treesitter",
+          "plugins/other"
         ]
       },
       {
@@ -55,28 +46,53 @@
         "pages": [
           "guides/customization",
           "guides/adding-plugins",
-          "guides/troubleshooting"
+          "guides/keybindings",
+          "guides/lsp-configuration"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/structure",
+          "reference/dependencies",
+          "reference/troubleshooting"
         ]
       }
     ]
   },
   "keyFeatures": [
     "Lazy.nvim plugin management",
-    "Full LSP support with Mason",
+    "LSP integration with Mason",
     "Telescope fuzzy finder",
     "Harpoon file navigation",
-    "Treesitter syntax highlighting",
-    "nvim-cmp autocompletion",
+    "Multiple colorscheme support",
     "Git integration with Neogit and Diffview",
-    "Multiple colorscheme options",
-    "Custom keybindings and autocommands"
+    "Treesitter syntax highlighting",
+    "Auto-completion with nvim-cmp",
+    "File explorer with nvim-tree",
+    "Custom keybindings and options"
   ],
   "publicApiSurface": [
-    "leyland.core.options",
-    "leyland.core.keymaps",
-    "leyland.core.autocommands",
-    "leyland.lazy",
-    "leyland.lsp",
-    "leyland.plugins.*"
+    "lua/leyland/core/options.lua",
+    "lua/leyland/core/keymaps.lua",
+    "lua/leyland/core/autocommands.lua",
+    "lua/leyland/lazy.lua",
+    "lua/leyland/lsp.lua",
+    "lua/leyland/plugins/colorscheme.lua",
+    "lua/leyland/plugins/telescope.lua",
+    "lua/leyland/plugins/nvim-tree.lua",
+    "lua/leyland/plugins/harpoon.lua",
+    "lua/leyland/plugins/alpha.lua",
+    "lua/leyland/plugins/lsp/lsp.lua",
+    "lua/leyland/plugins/lsp/mason.lua",
+    "lua/leyland/plugins/nvim-cmp.lua",
+    "lua/leyland/plugins/formatting.lua",
+    "lua/leyland/plugins/neogit.lua",
+    "lua/leyland/plugins/diffview.lua",
+    "lua/leyland/plugins/treesitter.lua",
+    "lua/leyland/plugins/trouble.lua",
+    "lua/leyland/plugins/flash.lua",
+    "lua/leyland/plugins/autopairs.lua",
+    "lua/leyland/plugins/snacks.lua"
   ]
 }
