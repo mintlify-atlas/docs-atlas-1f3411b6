@@ -1,0 +1,265 @@
+---
+title: 'Auto-Completion'
+description: 'nvim-cmp configuration for intelligent code completion'
+icon: 'sparkles'
+---
+
+## Overview
+
+nvim-cmp provides intelligent auto-completion with support for LSP, snippets, buffer text, and file paths. It integrates with LuaSnip for snippet expansion and lspkind for VS Code-like pictograms.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="LSP Completion" icon="code">
+    Intelligent suggestions from language servers
+  </Card>
+  <Card title="Snippet Support" icon="code-branch">
+    LuaSnip integration with friendly-snippets
+  </Card>
+  <Card title="Buffer Completion" icon="file">
+    Text from current buffer
+  </Card>
+  <Card title="Path Completion" icon="folder">
+    File system path suggestions
+  </Card>
+</CardGroup>
+
+## Configuration
+
+From `lua/leyland/plugins/nvim-cmp.lua:1`:
+
+```lua
+return {
+  "hrsh7th/nvim-cmp",
+  event = "InsertEnter",
+  dependencies = {
+    "hrsh7th/cmp-buffer", -- source for text in buffer
+    "hrsh7th/cmp-path", -- source for file system paths
+    {
+      "L3MON4D3/LuaSnip",
+      version = "v2.*",
+      build = "make install_jsregexp",
+    },
+    "saadparwaiz1/cmp_luasnip", -- for autocompletion
+    "rafamadriz/friendly-snippets", -- useful snippets
+    "onsails/lspkind.nvim", -- vs-code like pictograms
+  },
+  config = function()
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    local lspkind = require("lspkind")
+
+    -- loads vscode style snippets from installed plugins
+    require("luasnip.loaders.from_vscode").lazy_load()
+
+    cmp.setup({
+      snippet = {
+        expand = function(args)
+          luasnip.lsp_expand(args.body)
+        end,
+      },
+      mapping = cmp.mapping.preset.insert({
+        ["<C-k>"] = cmp.mapping.select_prev_item(),
+        ["<C-j>"] = cmp.mapping.select_next_item(),
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm({ select = false }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif luasnip.expand_or_jumpable() then
+            luasnip.expand_or_jump()
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+      }),
+      sources = cmp.config.sources({
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+        { name = "buffer" },
+        { name = "path" },
+      }),
+      formatting = {
+        format = lspkind.cmp_format({
+          maxwidth = 50,
+          ellipsis_char = "...",
+        }),
+      },
+    })
+  end,
+}
+```
+
+## Keymaps
+
+### Completion Window
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<C-k>` | Previous item | Select previous suggestion |
+| `<C-j>` | Next item | Select next suggestion |
+| `<C-b>` | Scroll docs up | Scroll documentation window up |
+| `<C-f>` | Scroll docs down | Scroll documentation window down |
+| `<C-Space>` | Complete | Show completion suggestions |
+| `<C-e>` | Abort | Close completion window |
+| `<CR>` | Confirm | Accept selected suggestion |
+| `<Tab>` | Next/Expand | Navigate to next item or expand snippet |
+
+### Snippet Navigation
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<Tab>` | Next jump | Jump to next snippet position |
+| `<S-Tab>` | Previous jump | Jump to previous snippet position |
+
+## Completion Sources
+
+Sources are prioritized in the following order:
+
+1. **nvim_lsp** - LSP-based completions (highest priority)
+2. **luasnip** - Snippet completions
+3. **buffer** - Text from current buffer
+4. **path** - File system paths
+
+## Customization
+
+### Adding Completion Sources
+
+To add additional completion sources:
+
+<Steps>
+  <Step title="Install the source plugin">
+    Add the cmp source plugin to your dependencies:
+
+    ```lua
+    dependencies = {
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",  -- Example: command-line completion
+    },
+    ```
+  </Step>
+
+  <Step title="Add to sources list">
+    Add the source to the `sources` configuration:
+
+    ```lua
+    sources = cmp.config.sources({
+      { name = "nvim_lsp" },
+      { name = "luasnip" },
+      { name = "buffer" },
+      { name = "path" },
+      { name = "cmdline" },  -- Add your source
+    }),
+    ```
+  </Step>
+</Steps>
+
+### Changing Keymaps
+
+Edit the `mapping` table in `nvim-cmp.lua:34`:
+
+```lua
+mapping = cmp.mapping.preset.insert({
+  ["<C-n>"] = cmp.mapping.select_next_item(),  -- Change to <C-n>
+  ["<C-p>"] = cmp.mapping.select_prev_item(),  -- Change to <C-p>
+  -- Add more custom mappings...
+}),
+```
+
+### Adjusting Window Appearance
+
+Customize the completion window width and appearance:
+
+```lua
+formatting = {
+  format = lspkind.cmp_format({
+    maxwidth = 70,  -- Change max width
+    ellipsis_char = "...",
+    mode = "symbol_text",  -- Show both symbol and text
+  }),
+},
+```
+
+## Snippets
+
+### Available Snippets
+
+nvim-luffy uses `friendly-snippets`, which provides VS Code-style snippets for many languages. Snippets are automatically loaded from `lua/leyland/plugins/nvim-cmp.lua:26`:
+
+```lua
+require("luasnip.loaders.from_vscode").lazy_load()
+```
+
+### Creating Custom Snippets
+
+Create custom snippets in `~/.config/nvim/snippets/`:
+
+```lua
+-- ~/.config/nvim/snippets/lua.lua
+local ls = require("luasnip")
+local s = ls.snippet
+local t = ls.text_node
+local i = ls.insert_node
+
+ls.add_snippets("lua", {
+  s("req", {
+    t('local '),
+    i(1, "module"),
+    t(' = require("'),
+    i(2, "module"),
+    t('")'),
+  }),
+})
+```
+
+Then load it in `nvim-cmp.lua`:
+
+```lua
+require("luasnip.loaders.from_lua").load({
+  paths = "~/.config/nvim/snippets"
+})
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why aren't LSP completions showing up?">
+    Ensure your LSP server is running with `:LspInfo`. Also verify that `cmp-nvim-lsp` is installed and configured in `lsp.lua`.
+  </Accordion>
+
+  <Accordion title="How do I disable auto-completion in certain file types?">
+    Add a condition to disable cmp for specific file types:
+
+    ```lua
+    cmp.setup({
+      enabled = function()
+        local buftype = vim.api.nvim_buf_get_option(0, "buftype")
+        if buftype == "prompt" then return false end
+        return true
+      end,
+    })
+    ```
+  </Accordion>
+
+  <Accordion title="How do I make Tab cycle through completions?">
+    The Tab key is already configured to cycle through completions and expand snippets. The behavior is defined in `nvim-cmp.lua:42`.
+  </Accordion>
+
+  <Accordion title="Can I use <CR> to auto-select the first item?">
+    Yes, change the confirm mapping to:
+
+    ```lua
+    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [LSP Configuration](/plugins/lsp) - Language server setup
+- [Keymaps](/configuration/keymaps) - All keybindings

@@ -1,0 +1,301 @@
+---
+title: 'Git Integration'
+description: 'Git workflow with Neogit and Diffview'
+icon: 'git-alt'
+---
+
+## Overview
+
+nvim-luffy provides powerful Git integration through Neogit (a Magit-inspired Git client) and Diffview (for viewing diffs and file history). Together, they offer a complete Git workflow without leaving Neovim.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Neogit" icon="git-alt">
+    Full-featured Git client with status, commit, push, pull
+  </Card>
+  <Card title="Diffview" icon="code-compare">
+    Beautiful diff viewing and merge conflict resolution
+  </Card>
+  <Card title="Branch Comparison" icon="code-branch">
+    Compare branches and view changes
+  </Card>
+  <Card title="Telescope Integration" icon="magnifying-glass">
+    Search through Git files and commits
+  </Card>
+</CardGroup>
+
+## Neogit
+
+### Configuration
+
+From `lua/leyland/plugins/neogit.lua:1`:
+
+```lua
+return {
+  "NeogitOrg/neogit",
+  lazy = true,
+  dependencies = {
+    "nvim-lua/plenary.nvim", -- required
+    "sindrets/diffview.nvim", -- optional - Diff integration
+    "nvim-telescope/telescope.nvim", -- optional
+    "ibhagwan/fzf-lua", -- optional
+    "nvim-mini/mini.pick", -- optional
+    "folke/snacks.nvim", -- optional
+  },
+  cmd = "Neogit",
+  keys = {
+    {
+      "<leader>gg",
+      function()
+        require("neogit").open({ kind = "floating" })
+      end,
+      desc = "Neogit (floating)",
+    },
+  },
+}
+```
+
+### Keymaps
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<leader>gg` | Open Neogit | Open Neogit in floating window |
+
+### Neogit Commands
+
+Inside Neogit, use these keybindings:
+
+#### Main Actions
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `?` | Help | Show all keybindings |
+| `q` | Close | Close Neogit window |
+| `<Tab>` | Toggle | Toggle section or file |
+| `<CR>` | Open | Open file or expand section |
+| `s` | Stage | Stage file or hunk |
+| `u` | Unstage | Unstage file or hunk |
+| `x` | Discard | Discard changes |
+| `c` | Commit | Open commit menu |
+| `P` | Push | Push commits |
+| `p` | Pull | Pull changes |
+| `b` | Branch | Branch operations |
+| `r` | Rebase | Rebase operations |
+| `m` | Merge | Merge operations |
+| `l` | Log | View commit log |
+
+#### Commit Menu (`c`)
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `c` | Commit | Create a commit |
+| `a` | Amend | Amend last commit |
+| `e` | Extend | Extend last commit (no edit) |
+| `w` | Reword | Reword last commit message |
+
+#### Branch Menu (`b`)
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `b` | Checkout | Checkout branch |
+| `c` | Create | Create new branch |
+| `r` | Rename | Rename branch |
+| `d` | Delete | Delete branch |
+
+## Diffview
+
+### Configuration
+
+From `lua/leyland/plugins/diffview.lua:1`:
+
+```lua
+return {
+  "sindrets/diffview.nvim",
+  cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+  keys = {
+    { "<leader>dd", "<cmd>DiffviewOpen<cr>", desc = "Open diff view" },
+    { "<leader>df", "<cmd>DiffviewClose<cr>", desc = "Close diff view" },
+    { "<leader>ds", "<cmd>:DiffviewOpen origin/main...HEAD<cr>", desc = "Open branch diff view" },
+  },
+}
+```
+
+### Keymaps
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<leader>dd` | Open diff | Open diff view for current changes |
+| `<leader>df` | Close diff | Close diff view |
+| `<leader>ds` | Branch diff | Compare current branch with origin/main |
+
+### Diffview Commands
+
+| Command | Description |
+|---------|-------------|
+| `:DiffviewOpen` | Open diff view of current changes |
+| `:DiffviewOpen HEAD~2` | View changes from 2 commits ago |
+| `:DiffviewOpen HEAD~4..HEAD~2` | View changes in commit range |
+| `:DiffviewOpen origin/main...HEAD` | Compare with main branch |
+| `:DiffviewClose` | Close diff view |
+| `:DiffviewToggleFiles` | Toggle file panel |
+| `:DiffviewFocusFiles` | Focus file panel |
+| `:DiffviewFileHistory` | View file history |
+| `:DiffviewFileHistory %` | View current file history |
+
+### Inside Diffview
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<Tab>` | Next file | Jump to next file |
+| `<S-Tab>` | Previous file | Jump to previous file |
+| `]c` | Next hunk | Jump to next change |
+| `[c` | Previous hunk | Jump to previous change |
+| `<leader>co` | Checkout ours | During merge, choose our version |
+| `<leader>ct` | Checkout theirs | During merge, choose their version |
+| `<leader>cb` | Checkout both | During merge, keep both versions |
+| `<leader>cn` | Checkout none | During merge, keep neither version |
+
+## Usage Examples
+
+### Basic Git Workflow
+
+<Steps>
+  <Step title="Stage Changes">
+    Press `<leader>gg` to open Neogit, navigate to unstaged files, and press `s` to stage.
+  </Step>
+
+  <Step title="Review Changes">
+    Press `<leader>dd` to open Diffview and review your staged changes visually.
+  </Step>
+
+  <Step title="Commit">
+    In Neogit, press `c` then `c` to commit. Write your message and save to commit.
+  </Step>
+
+  <Step title="Push">
+    Press `P` in Neogit to open push menu, then `p` to push to remote.
+  </Step>
+</Steps>
+
+### Viewing Branch Differences
+
+Compare your branch with main:
+
+```vim
+<leader>ds
+" or
+:DiffviewOpen origin/main...HEAD
+```
+
+Compare two branches:
+
+```vim
+:DiffviewOpen feature-branch..main
+```
+
+### Resolving Merge Conflicts
+
+<Steps>
+  <Step title="Open conflict in Diffview">
+    When you have merge conflicts, open them with:
+    ```vim
+    :DiffviewOpen
+    ```
+  </Step>
+
+  <Step title="Choose version">
+    Navigate to the conflict and use:
+    - `<leader>co` - Choose ours (current branch)
+    - `<leader>ct` - Choose theirs (incoming branch)
+    - `<leader>cb` - Keep both versions
+  </Step>
+
+  <Step title="Stage and commit">
+    After resolving, close Diffview with `:DiffviewClose`, then use Neogit to stage and commit.
+  </Step>
+</Steps>
+
+### Viewing File History
+
+View the entire commit history for the current file:
+
+```vim
+:DiffviewFileHistory %
+```
+
+View commit history for the entire repository:
+
+```vim
+:DiffviewFileHistory
+```
+
+## Additional Git Features
+
+### Todo Comments Integration
+
+Search for TODO comments in your codebase (from Telescope configuration):
+
+```vim
+<leader>ft
+" or
+:TodoTelescope
+```
+
+From `lua/leyland/plugins/telescope.lua:42`:
+
+```lua
+keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
+```
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I customize the Neogit window?">
+    You can configure Neogit to open in different modes:
+
+    ```lua
+    -- Floating window (default)
+    require("neogit").open({ kind = "floating" })
+
+    -- Split window
+    require("neogit").open({ kind = "split" })
+
+    -- Tab
+    require("neogit").open({ kind = "tab" })
+    ```
+  </Accordion>
+
+  <Accordion title="Can I use Neogit for interactive rebase?">
+    Yes! In Neogit, press `r` to open the rebase menu, then `i` for interactive rebase. Select the base commit and edit the rebase sequence.
+  </Accordion>
+
+  <Accordion title="How do I compare my changes with a specific commit?">
+    Use Diffview with commit hashes:
+
+    ```vim
+    :DiffviewOpen abc123..HEAD
+    ```
+  </Accordion>
+
+  <Accordion title="What if I want to use lazygit instead?">
+    You can replace Neogit with lazygit by creating a keymap:
+
+    ```lua
+    vim.keymap.set("n", "<leader>gg", "<cmd>!lazygit<cr>", { desc = "Lazygit" })
+    ```
+  </Accordion>
+
+  <Accordion title="How do I view the diff of a specific file?">
+    Navigate to the file in Neogit and press `<CR>`, or use:
+
+    ```vim
+    :DiffviewOpen -- path/to/file.lua
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [Telescope](/plugins/telescope) - Search Git files and branches
+- [Keymaps](/configuration/keymaps) - All keybindings

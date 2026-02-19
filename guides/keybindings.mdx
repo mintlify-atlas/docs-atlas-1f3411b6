@@ -1,0 +1,498 @@
+---
+title: 'Customizing Keybindings'
+description: 'Learn how to create and customize keybindings in nvim-luffy'
+---
+
+## Overview
+
+Keybindings (keymaps) are keyboard shortcuts that trigger commands in Neovim. This guide shows you how to customize and create your own keybindings.
+
+## Understanding Vim Modes
+
+Neovim has different modes, and keybindings can be mode-specific:
+
+- `n` - Normal mode
+- `i` - Insert mode
+- `v` - Visual mode
+- `x` - Visual block mode
+- `t` - Terminal mode
+- `c` - Command-line mode
+
+## Keymap Files Structure
+
+Keymaps are defined in two main places:
+
+1. **Global keymaps**: `lua/leyland/core/keymaps.lua`
+2. **Plugin-specific keymaps**: Inside each plugin's config function
+3. **LSP keymaps**: `lua/leyland/lsp.lua` (attached when LSP starts)
+
+## The Leader Key
+
+The leader key is a prefix for custom keybindings. By default, it's set to `<Space>`:
+
+```lua
+vim.g.mapleader = " "
+```
+
+<Tip>
+  The leader key should be set before any keymaps that use it. It's defined at the top of `lua/leyland/core/keymaps.lua`.
+</Tip>
+
+## Basic Keymap Syntax
+
+The basic syntax for creating a keymap:
+
+```lua
+vim.keymap.set(mode, keys, action, options)
+```
+
+### Parameters
+
+- **mode**: String or table of mode letters (`"n"`, `{"n", "v"}`, etc.)
+- **keys**: The key combination to press
+- **action**: Command string or Lua function to execute
+- **options**: Table of options (optional)
+
+### Common Options
+
+```lua
+{
+  desc = "Description",      -- Description shown in which-key
+  silent = true,             -- Don't show command in command line
+  noremap = true,            -- Don't allow recursive mapping (default)
+  buffer = 0,                -- Buffer-local mapping
+}
+```
+
+## Adding Global Keymaps
+
+Global keymaps are available everywhere. Add them to `lua/leyland/core/keymaps.lua`.
+
+<Steps>
+  <Step title="Open the keymaps file">
+    Edit `lua/leyland/core/keymaps.lua`
+  </Step>
+  
+  <Step title="Add your keymap">
+    Add a new `keymap.set()` call at the end of the file.
+  </Step>
+  
+  <Step title="Reload configuration">
+    Restart Neovim or run `:source $MYVIMRC` to apply changes.
+  </Step>
+</Steps>
+
+### Example: Clear Search Highlights
+
+```lua
+local keymap = vim.keymap
+
+-- Clear search highlights with <leader>nh
+keymap.set("n", "<leader>nh", ":nohl<CR>", { 
+  desc = "Clear search highlights" 
+})
+```
+
+### Example: Quick Save
+
+```lua
+-- Save with <leader>w
+keymap.set("n", "<leader>w", "<cmd>w<CR>", { 
+  desc = "Save file" 
+})
+```
+
+### Example: Better Window Navigation
+
+```lua
+-- Navigate windows with Ctrl+hjkl
+keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
+keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
+keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
+keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+```
+
+## Existing Global Keymaps
+
+Here are the global keymaps defined in the configuration:
+
+<AccordionGroup>
+  <Accordion title="Window Management">
+    ```lua
+    <leader>|  -- Split window vertically
+    <leader>sh -- Split window horizontally
+    ```
+  </Accordion>
+  
+  <Accordion title="Buffer Management">
+    ```lua
+    <leader>bd -- Close current buffer
+    <leader>ba -- Close all buffers
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Plugin-Specific Keymaps
+
+Plugin keymaps are defined in each plugin's config function.
+
+### Example: Telescope Keymaps
+
+From `lua/leyland/plugins/telescope.lua`:
+
+```lua
+config = function()
+  local telescope = require("telescope")
+  telescope.setup({}) -- Plugin setup
+  
+  -- Set keymaps after setup
+  local keymap = vim.keymap
+  
+  keymap.set("n", "<leader><leader>", "<cmd>Telescope find_files<cr>", { 
+    desc = "Fuzzy find files in cwd" 
+  })
+  keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<cr>", { 
+    desc = "Fuzzy find recent files" 
+  })
+  keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<cr>", { 
+    desc = "Find string in cwd" 
+  })
+end,
+```
+
+### Example: Custom Plugin Keymap
+
+Adding a keymap for a plugin you're configuring:
+
+```lua
+return {
+  "plugin/name",
+  config = function()
+    require("plugin").setup({})
+    
+    -- Add custom keymap
+    vim.keymap.set("n", "<leader>p", "<cmd>PluginCommand<cr>", {
+      desc = "Run plugin command",
+    })
+  end,
+}
+```
+
+## LSP Keymaps
+
+LSP keymaps are defined in `lua/leyland/lsp.lua` and are automatically attached when an LSP server starts.
+
+### Existing LSP Keymaps
+
+<AccordionGroup>
+  <Accordion title="Navigation">
+    ```lua
+    gR  -- Show LSP references (Telescope)
+    gd  -- Go to declaration/definition
+    gi  -- Show LSP implementations (Telescope)
+    gt  -- Show LSP type definitions (Telescope)
+    ```
+  </Accordion>
+  
+  <Accordion title="Code Actions">
+    ```lua
+    <leader>ca -- See available code actions
+    <leader>rn -- Smart rename
+    ```
+  </Accordion>
+  
+  <Accordion title="Diagnostics">
+    ```lua
+    <leader>D  -- Show buffer diagnostics (Telescope)
+    <leader>d  -- Show line diagnostics
+    [d         -- Go to previous diagnostic
+    ]d         -- Go to next diagnostic
+    ```
+  </Accordion>
+  
+  <Accordion title="Documentation">
+    ```lua
+    K          -- Show documentation for what is under cursor
+    <leader>rs -- Restart LSP
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Customizing LSP Keymaps
+
+Edit `lua/leyland/lsp.lua` to customize LSP keymaps:
+
+**Before:**
+```lua
+opts.desc = "Show LSP references"
+keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+```
+
+**After (change to <leader>lr):**
+```lua
+opts.desc = "Show LSP references"
+keymap.set("n", "<leader>lr", "<cmd>Telescope lsp_references<CR>", opts)
+```
+
+### Adding Custom LSP Keymaps
+
+Add new keymaps inside the `LspAttach` autocmd:
+
+```lua
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf, silent = true }
+    
+    -- Existing keymaps...
+    
+    -- Add your custom LSP keymap
+    opts.desc = "Format buffer"
+    keymap.set("n", "<leader>lf", vim.lsp.buf.format, opts)
+  end,
+})
+```
+
+## Advanced Keymap Patterns
+
+### Pattern 1: Using Lua Functions
+
+Execute custom logic with a keymap:
+
+```lua
+keymap.set("n", "<leader>x", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  print("Current buffer: " .. bufnr)
+end, { desc = "Print buffer number" })
+```
+
+### Pattern 2: Multiple Modes
+
+Apply a keymap to multiple modes:
+
+```lua
+-- Works in normal and visual mode
+keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
+  desc = "Code actions",
+})
+```
+
+### Pattern 3: Buffer-Local Keymaps
+
+Create keymaps that only work in specific buffers:
+
+```lua
+-- In an autocommand or LSP attach
+local opts = { buffer = bufnr, desc = "Buffer-specific action" }
+keymap.set("n", "<leader>x", "<cmd>Command<cr>", opts)
+```
+
+### Pattern 4: Conditional Keymaps
+
+Set keymaps based on conditions:
+
+```lua
+if vim.fn.executable("rg") == 1 then
+  keymap.set("n", "<leader>rg", "<cmd>Telescope live_grep<cr>", {
+    desc = "Grep with ripgrep",
+  })
+else
+  keymap.set("n", "<leader>rg", "<cmd>Telescope grep_string<cr>", {
+    desc = "Grep with vimgrep",
+  })
+end
+```
+
+### Pattern 5: Repeating Actions
+
+Create keymaps that can be repeated with `.`:
+
+```lua
+-- Using vim.cmd for repeatability
+keymap.set("n", "<leader>d", function()
+  vim.cmd('normal! "_dd')  -- Delete line without yanking
+end, { desc = "Delete line to black hole register" })
+```
+
+## Special Key Notations
+
+<AccordionGroup>
+  <Accordion title="Modifier Keys">
+    ```lua
+    <C-x>   -- Ctrl+x
+    <A-x>   -- Alt+x
+    <S-x>   -- Shift+x
+    <M-x>   -- Meta+x
+    <D-x>   -- Command+x (Mac)
+    ```
+  </Accordion>
+  
+  <Accordion title="Special Keys">
+    ```lua
+    <CR>    -- Enter
+    <Space> -- Space
+    <Tab>   -- Tab
+    <Esc>   -- Escape
+    <BS>    -- Backspace
+    <Del>   -- Delete
+    <Up>    -- Arrow up
+    <Down>  -- Arrow down
+    <Left>  -- Arrow left
+    <Right> -- Arrow right
+    ```
+  </Accordion>
+  
+  <Accordion title="Function Keys">
+    ```lua
+    <F1>    -- Function key 1
+    <F12>   -- Function key 12
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Finding Keybindings
+
+Use Telescope to find existing keybindings:
+
+```
+<leader>fk  -- Open Telescope keymaps picker
+```
+
+Or use the built-in command:
+
+```vim
+:map       -- Show all mappings
+:nmap      -- Show normal mode mappings
+:imap      -- Show insert mode mappings
+:vmap      -- Show visual mode mappings
+```
+
+## Overriding Existing Keymaps
+
+To override a keymap, simply define it again with the same mode and keys:
+
+**Example: Override buffer close**
+```lua
+-- Original in keymaps.lua
+keymap.set("n", "<leader>bd", "<cmd>bd<CR>", { desc = "Close buffer" })
+
+-- Override later in the same file or in a plugin config
+keymap.set("n", "<leader>bd", "<cmd>Bdelete<CR>", { 
+  desc = "Close buffer (preserve layout)" 
+})
+```
+
+## Disabling Default Keymaps
+
+To disable a default keymap, map it to `<Nop>` (no operation):
+
+```lua
+-- Disable arrow keys in normal mode
+keymap.set("n", "<Up>", "<Nop>")
+keymap.set("n", "<Down>", "<Nop>")
+keymap.set("n", "<Left>", "<Nop>")
+keymap.set("n", "<Right>", "<Nop>")
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Descriptions" icon="comment">
+    Always add a `desc` option to help remember what keymaps do.
+  </Card>
+  
+  <Card title="Logical Grouping" icon="layer-group">
+    Group related keymaps under similar leader key combinations.
+  </Card>
+  
+  <Card title="Avoid Conflicts" icon="triangle-exclamation">
+    Check existing keymaps before adding new ones to avoid conflicts.
+  </Card>
+  
+  <Card title="Document Complex Keymaps" icon="book">
+    Add comments for keymaps that do non-obvious things.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Avoid remapping essential Vim keys (like `hjkl`, `w`, `b`, etc.) unless you have a good reason.
+</Warning>
+
+## Common Keymap Recipes
+
+### Quick Exit Insert Mode
+
+```lua
+-- Press jk to exit insert mode
+keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode" })
+```
+
+### Move Lines Up/Down
+
+```lua
+-- Move lines in visual mode with J/K
+keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
+keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
+```
+
+### Better Indenting
+
+```lua
+-- Stay in visual mode when indenting
+keymap.set("v", "<", "<gv", { desc = "Indent left" })
+keymap.set("v", ">", ">gv", { desc = "Indent right" })
+```
+
+### Center Screen After Navigation
+
+```lua
+-- Keep cursor centered when jumping
+keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down and center" })
+keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up and center" })
+keymap.set("n", "n", "nzzzv", { desc = "Next result and center" })
+keymap.set("n", "N", "Nzzzv", { desc = "Previous result and center" })
+```
+
+### Paste Without Overwriting Register
+
+```lua
+-- Paste over selection without yanking
+keymap.set("x", "<leader>p", '"_dP', { 
+  desc = "Paste without yanking" 
+})
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Keymap not working">
+    - Check if another keymap is overriding it
+    - Verify the mode is correct (`n`, `i`, `v`, etc.)
+    - Use `:verbose map <keys>` to see what's mapped
+    - Check if the plugin is loaded (for plugin-specific keymaps)
+  </Accordion>
+  
+  <Accordion title="Keymap conflicts">
+    - Use `:Telescope keymaps` to find conflicting keymaps
+    - Use `:verbose map <keys>` to see where a keymap is defined
+    - Choose a different key combination
+  </Accordion>
+  
+  <Accordion title="Leader key not working">
+    - Make sure `vim.g.mapleader` is set before any keymaps
+    - Restart Neovim after changing the leader key
+    - Check that you're using `<leader>` in the keymap string
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Add Plugins" href="/guides/adding-plugins" icon="plug">
+    Learn how to install plugins with their own keybindings
+  </Card>
+  
+  <Card title="Configure LSP" href="/guides/lsp-configuration" icon="server">
+    Customize LSP keybindings for your workflow
+  </Card>
+</CardGroup>

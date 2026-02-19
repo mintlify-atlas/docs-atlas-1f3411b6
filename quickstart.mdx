@@ -1,80 +1,449 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: 'Quick Start'
+description: 'Get productive with nvim-luffy in under 5 minutes'
 ---
 
-## Get started in three steps
+## Your First 5 Minutes
 
-Get your documentation site running locally and make your first customization.
+This guide will get you from zero to productive with nvim-luffy. We'll cover the essential keybindings and workflows you need to start coding.
 
-### Step 1: Set up your local environment
+<Note>
+  All keybindings in nvim-luffy use `Space` as the leader key. This guide uses `<leader>` to represent the Space key.
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## The Dashboard
+
+When you first open Neovim, you'll see the One Piece-themed dashboard:
+
+```
+                    ⠀⠀⠀⠀⠀⠀⠀⣀⣤⣤⠶⠶⠶⠶⠤⠤⠤⣄⣀
+                ⠀⠀⠀⠀⠀⣠⠔⠊⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠷⣦⣄⡀
+            ⠀⢀⡴⢶⣾⠋⢉⣉⣛⣛⣍⣽⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠷⣤⡀
+        ⠀⠀⠀⢀⣼⠴⠋⢀⡔⠉⠀⠀⣀⣠⣤⣤⣵⣼⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀
+        [One Piece ASCII art...]
+
+        "Maybe the One Piece was the commits you made along the way."
+
+                  Find file
+                  Recent files
+                  Quit
+```
+
+From here, you can:
+- Press `f` to find files
+- Press `r` to see recent files
+- Press `q` to quit
+
+## Essential Keybindings
+
+### Finding and Opening Files
+
+The fastest way to navigate your project:
+
+<Steps>
+  <Step title="Fuzzy Find Files">
+    ```vim
+    <leader><leader>  # or Space Space
+    ```
+
+    Opens Telescope's file finder. Start typing to filter:
+    - `init.lua` - finds files with "init" and "lua"
+    - `user` - finds all files with "user" in the name
+
+    **Navigation:**
+    - `Ctrl+j` / `Ctrl+k` - Move down/up
+    - `Enter` - Open file
+    - `Esc` - Close
+  </Step>
+
+  <Step title="Search in Files">
+    ```vim
+    <leader>/  # Live grep
+    ```
+
+    Search for text across your entire project:
+    - Type your search term
+    - Results update in real-time
+    - Press `Enter` to jump to the match
+
+    ```vim
+    <leader>fc  # Find word under cursor
+    ```
+
+    Instantly search for the word under your cursor.
+  </Step>
+
+  <Step title="Recent Files">
+    ```vim
+    <leader>fr
+    ```
+
+    Quick access to recently opened files.
+  </Step>
+</Steps>
+
+### File Explorer
+
+When you need a tree view of your project:
+
+```vim
+<leader>e  # Toggle nvim-tree
+```
+
+**Inside nvim-tree:**
+- `j` / `k` - Navigate up/down
+- `l` - Open file or expand folder
+- `h` - Close folder
+- `a` - Create new file
+- `d` - Delete file
+- `r` - Rename file
+- `y` - Copy file
+- `p` - Paste file
+
+<Tip>
+  The file explorer opens on the right side by default. You can change this in `lua/leyland/plugins/nvim-tree.lua`.
+</Tip>
+
+### Harpoon: Lightning-Fast Navigation
+
+Harpoon is your secret weapon for navigating between important files:
+
+<Steps>
+  <Step title="Mark Files">
+    ```vim
+    <leader>H  # Add current file to Harpoon
+    ```
+
+    Mark the files you're actively working on (max 9).
+  </Step>
+
+  <Step title="View Marked Files">
+    ```vim
+    <leader>h  # Open Harpoon menu
+    ```
+
+    See all your marked files and select one to jump to.
+  </Step>
+
+  <Step title="Jump Directly">
+    ```vim
+    <leader>1  # Jump to file 1
+    <leader>2  # Jump to file 2
+    <leader>3  # Jump to file 3
+    # ... up to 9
+    ```
+
+    Instantly jump to specific marked files.
+  </Step>
+</Steps>
+
+<Note>
+  **Typical workflow:** Mark your main files (e.g., component, test file, config) and jump between them with `<leader>1`, `<leader>2`, etc. This is faster than any other navigation method.
+</Note>
+
+## LSP: Code Intelligence
+
+### Autocompletion
+
+As you type, nvim-cmp provides intelligent suggestions:
+
+```vim
+Ctrl+j / Ctrl+k  # Navigate suggestions
+Tab              # Select next suggestion
+Enter            # Accept suggestion
+Ctrl+Space       # Trigger completion manually
+Ctrl+e           # Close completion menu
+```
+
+**Example:** Start typing in a TypeScript file:
+```typescript
+con|  # Type 'con' and you'll see:
+      # const, console, constructor, etc.
+```
+
+### LSP Actions
+
+With your cursor on a symbol:
+
+```vim
+K              # Show hover documentation
+gd             # Go to definition
+gr             # Go to references
+gi             # Go to implementation
+<leader>ca     # Code actions (refactorings, fixes)
+<leader>rn     # Rename symbol
+```
+
+**Example workflow:**
+```lua
+-- Cursor on 'myFunction'
+K   # See documentation
+gd  # Jump to definition
+gr  # See all usages
+<leader>rn  # Rename everywhere
+```
+
+### Diagnostics
+
+```vim
+<leader>d   # Show line diagnostics
+[d          # Previous diagnostic
+]d          # Next diagnostic
+<leader>q   # Open diagnostics list
+```
+
+<Warning>
+  Diagnostics only work if the appropriate LSP server is installed. Use `:Mason` to check installed servers.
+</Warning>
+
+## Editing Workflows
+
+### Window Management
+
+```vim
+<leader>|   # Split vertically
+<leader>sh  # Split horizontally
+Ctrl+h/j/k/l  # Navigate between splits
+<leader>bd  # Close current buffer
+<leader>ba  # Close all buffers
+```
+
+### Copy/Paste
+
+With `clipboard = "unnamedplus"` enabled:
+
+```vim
+y   # Yank (copy) to system clipboard
+p   # Paste from system clipboard
+```
+
+You can now copy/paste between Neovim and other applications seamlessly.
+
+### Flash: Jump Anywhere
+
+Flash lets you jump to any visible location with minimal keystrokes:
+
+```vim
+s   # Start Flash search
+    # Type 2 characters where you want to jump
+    # Type the highlighted label to jump there
+```
+
+**Example:**
+1. Press `s`
+2. Type `fu` (for "function")
+3. Labels appear over each match: `a`, `b`, `c`, etc.
+4. Type the label to jump there instantly
+
+## Git Integration
+
+### Neogit
+
+```vim
+<leader>gg  # Open Neogit (git status)
+```
+
+**Inside Neogit:**
+- `s` - Stage/unstage file or hunk
+- `c` - Commit (opens commit message editor)
+- `P` - Push
+- `p` - Pull
+- `l` - View log
+- `?` - Show help
+
+### Diffview
+
+```vim
+:DiffviewOpen    # View changes
+:DiffviewClose   # Close diff view
+:DiffviewFileHistory  # File history
+```
+
+## Quick Configuration
+
+### Change Colorscheme
+
+Edit `lua/leyland/plugins/colorscheme.lua`:
+
+```lua {37}
+config = function()
+  -- Available themes:
+  -- "catppuccin", "tokyonight", "bamboo", 
+  -- "onedark", "rose-pine"
+  vim.cmd.colorscheme("bamboo")  -- Change this line
+end,
+```
+
+Restart Neovim or run `:colorscheme <theme_name>`.
+
+### Add Custom Keybindings
+
+Edit `lua/leyland/core/keymaps.lua`:
+
+```lua
+-- Add your custom keymaps
+keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
+```
+
+### Adjust Options
+
+Edit `lua/leyland/core/options.lua`:
+
+```lua
+opt.relativenumber = true   # Relative line numbers
+opt.wrap = false            # Don't wrap lines
+opt.tabstop = 2             # Tab width
+opt.expandtab = true        # Use spaces instead of tabs
+```
+
+## Your First Coding Session
+
+Let's put it all together in a typical workflow:
+
+<Steps>
+  <Step title="Open Your Project">
+    ```bash
+    cd ~/projects/my-app
+    nvim
+    ```
+
+    You'll see the Alpha dashboard.
+  </Step>
+
+  <Step title="Find Your Main File">
+    ```vim
+    <leader><leader>  # Fuzzy find
+    # Type: index
+    # Select: src/index.ts
+    ```
+  </Step>
+
+  <Step title="Mark Important Files">
+    ```vim
+    <leader>H  # Mark index.ts as file 1
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    <leader><leader>  # Find test file
+    # Type: test
+    # Open: index.test.ts
+    <leader>H  # Mark as file 2
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    <leader>1  # Jump back to index.ts
+    ```
 
-### Step 2: Deploy your changes
+    Now you can toggle between files with `<leader>1` and `<leader>2`.
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+  <Step title="Start Coding with LSP">
+    ```typescript
+    // Start typing
+    function calculateTotal|  # Auto-completion appears
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    // Hover for docs
+    K  # On 'calculateTotal'
+    
+    // Jump to definition
+    gd  # On a function call
+    
+    // Rename a variable
+    <leader>rn  # On variable name
+    ```
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="Search Your Codebase">
+    ```vim
+    <leader>/  # Live grep
+    # Type: TODO
+    # See all TODOs in your project
+    ```
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Commit Your Changes">
+    ```vim
+    <leader>gg  # Open Neogit
+    s           # Stage changes
+    c           # Commit
+    # Write message and save
+    P           # Push
+    ```
+  </Step>
+</Steps>
 
-### Step 3: Go live
+## Keybinding Cheatsheet
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+### Core Navigation
+| Keybinding | Action |
+|------------|--------|
+| `<leader><leader>` | Fuzzy find files |
+| `<leader>/` | Search in files |
+| `<leader>fr` | Recent files |
+| `<leader>e` | Toggle file explorer |
+| `<leader>h` | Harpoon menu |
+| `<leader>H` | Mark file in Harpoon |
+| `<leader>1-9` | Jump to Harpoon file 1-9 |
 
-## Next steps
+### LSP
+| Keybinding | Action |
+|------------|--------|
+| `K` | Hover documentation |
+| `gd` | Go to definition |
+| `gr` | Go to references |
+| `<leader>ca` | Code actions |
+| `<leader>rn` | Rename symbol |
+| `[d` / `]d` | Previous/next diagnostic |
 
-Now that you have your docs running, explore these key features:
+### Windows & Buffers
+| Keybinding | Action |
+|------------|--------|
+| `<leader>\|` | Split vertical |
+| `<leader>sh` | Split horizontal |
+| `<leader>bd` | Close buffer |
+| `<leader>ba` | Close all buffers |
+
+### Git
+| Keybinding | Action |
+|------------|--------|
+| `<leader>gg` | Open Neogit |
+
+<Tip>
+  Press `<leader>fk` in Neovim to search all keybindings with Telescope!
+</Tip>
+
+## Next Steps
+
+You now know the essentials! Here's what to explore next:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="Advanced Telescope"
+    icon="telescope"
+    href="/guides/telescope"
+  >
+    Master advanced search patterns and filters
+  </Card>
+  <Card
+    title="LSP Deep Dive"
+    icon="microchip"
+    href="/reference/lsp"
+  >
+    Configure language servers and diagnostics
+  </Card>
+  <Card
+    title="Custom Keybindings"
+    icon="keyboard"
+    href="/guides/keybindings"
+  >
+    Create your own keybinding patterns
+  </Card>
+  <Card
+    title="Plugin Configuration"
+    icon="plug"
+    href="/guides/plugins"
+  >
+    Add new plugins and customize existing ones
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Pro tip:** Use `:Lazy` to manage plugins, `:Mason` for LSP servers, and `:checkhealth` to diagnose issues.
 </Note>

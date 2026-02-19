@@ -1,0 +1,292 @@
+---
+title: 'Code Formatting'
+description: 'Automatic code formatting with conform.nvim'
+icon: 'wand-magic-sparkles'
+---
+
+## Overview
+
+conform.nvim provides fast and flexible code formatting with support for multiple formatters per language. nvim-luffy is configured to format on save with customizable formatters for each file type.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Format on Save" icon="floppy-disk">
+    Automatically format files when saving
+  </Card>
+  <Card title="Multiple Formatters" icon="layer-group">
+    Use multiple formatters per language
+  </Card>
+  <Card title="LSP Fallback" icon="code">
+    Falls back to LSP formatting if no formatter configured
+  </Card>
+  <Card title="Manual Formatting" icon="keyboard">
+    Format on demand with `<leader>mp`
+  </Card>
+</CardGroup>
+
+## Configuration
+
+From `lua/leyland/plugins/formatting.lua:1`:
+
+```lua
+return {
+  "stevearc/conform.nvim",
+  event = { "BufReadPre", "BufNewFile" },
+  config = function()
+    local conform = require("conform")
+
+    conform.setup({
+      formatters_by_ft = {
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        javascriptreact = { "prettier" },
+        typescriptreact = { "prettier" },
+        svelte = { "prettier" },
+        css = { "prettier" },
+        html = { "prettier" },
+        json = { "prettier" },
+        yaml = { "prettier" },
+        markdown = { "prettier" },
+        graphql = { "prettier" },
+        liquid = { "prettier" },
+        lua = { "stylua" },
+        python = { "isort", "black" },
+      },
+      format_on_save = {
+        lsp_fallback = true,
+        async = false,
+        timeout_ms = 3000,
+      },
+    })
+
+    vim.keymap.set({ "n", "v" }, "<leader>mp", function()
+      conform.format({
+        lsp_fallback = true,
+        async = false,
+        timeout_ms = 1000,
+      })
+    end, { desc = "Format file or range (in visual mode)" })
+  end,
+}
+```
+
+## Default Formatters
+
+| Language | Formatter(s) | Description |
+|----------|--------------|-------------|
+| JavaScript/TypeScript | prettier | JS/TS/JSX/TSX formatting |
+| React | prettier | React component formatting |
+| HTML/CSS | prettier | Web formatting |
+| JSON/YAML | prettier | Data format formatting |
+| Markdown | prettier | Documentation formatting |
+| GraphQL | prettier | GraphQL query formatting |
+| Lua | stylua | Lua code formatting |
+| Python | isort, black | Python import sorting and formatting |
+| Svelte | prettier | Svelte component formatting |
+| Liquid | prettier | Liquid template formatting |
+
+## Keymaps
+
+| Key | Mode | Action | Description |
+|-----|------|--------|-------------|
+| `<leader>mp` | Normal | Format file | Format entire file |
+| `<leader>mp` | Visual | Format range | Format selected lines |
+
+## Format on Save
+
+Files are automatically formatted when saved with the following options:
+
+- **lsp_fallback**: Uses LSP formatting if no formatter is configured
+- **async**: Synchronous formatting (blocks until complete)
+- **timeout_ms**: 3 second timeout for formatting operations
+
+From `lua/leyland/plugins/formatting.lua:24`:
+
+```lua
+format_on_save = {
+  lsp_fallback = true,
+  async = false,
+  timeout_ms = 3000,
+},
+```
+
+## Adding Formatters
+
+<Steps>
+  <Step title="Install the formatter">
+    Formatters are installed via Mason. Add to `mason.lua`:
+
+    ```lua
+    ensure_installed = {
+      "prettier",
+      "stylua",
+      "rustfmt",  -- Example: Add Rust formatter
+    },
+    ```
+  </Step>
+
+  <Step title="Configure the formatter">
+    Add the formatter to `formatters_by_ft` in `formatting.lua:8`:
+
+    ```lua
+    formatters_by_ft = {
+      javascript = { "prettier" },
+      lua = { "stylua" },
+      rust = { "rustfmt" },  -- Add your formatter
+    },
+    ```
+  </Step>
+
+  <Step title="Restart and test">
+    Restart Neovim and save a file of the configured type to test formatting.
+  </Step>
+</Steps>
+
+## Multiple Formatters
+
+You can chain multiple formatters for a single file type. They run sequentially:
+
+```lua
+formatters_by_ft = {
+  python = { "isort", "black" },  -- isort runs first, then black
+},
+```
+
+## Customizing Format Behavior
+
+### Disable Format on Save
+
+To disable automatic formatting on save, remove the `format_on_save` configuration:
+
+```lua
+conform.setup({
+  formatters_by_ft = {
+    -- ... your formatters
+  },
+  -- Remove or comment out format_on_save
+  -- format_on_save = { ... },
+})
+```
+
+### Format Specific File Types Only
+
+Conditionally enable format on save:
+
+```lua
+format_on_save = function(bufnr)
+  -- Disable for JavaScript files
+  if vim.bo[bufnr].filetype == "javascript" then
+    return
+  end
+  return {
+    lsp_fallback = true,
+    timeout_ms = 3000,
+  }
+end,
+```
+
+### Adjust Timeout
+
+Increase timeout for slower formatters:
+
+```lua
+format_on_save = {
+  lsp_fallback = true,
+  async = false,
+  timeout_ms = 5000,  -- Increase to 5 seconds
+},
+```
+
+### Async Formatting
+
+Enable async formatting (doesn't block on save):
+
+```lua
+format_on_save = {
+  lsp_fallback = true,
+  async = true,  -- Enable async
+  timeout_ms = 3000,
+},
+```
+
+<Warning>
+  Async formatting may result in files being saved before formatting completes.
+</Warning>
+
+## Formatter-Specific Configuration
+
+Customize individual formatter options:
+
+```lua
+conform.setup({
+  formatters_by_ft = {
+    lua = { "stylua" },
+  },
+  formatters = {
+    stylua = {
+      prepend_args = { "--indent-type", "Spaces", "--indent-width", "2" },
+    },
+  },
+})
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `:ConformInfo` | Show formatter information for current buffer |
+| `:lua require("conform").format()` | Manually trigger formatting |
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why isn't my file being formatted?">
+    Check:
+    1. The formatter is installed via Mason (`:Mason`)
+    2. The file type is configured in `formatters_by_ft`
+    3. Run `:ConformInfo` to see formatter status
+  </Accordion>
+
+  <Accordion title="How do I use a different formatter for a language?">
+    Edit `formatters_by_ft` in `formatting.lua:8` and replace the formatter:
+
+    ```lua
+    javascript = { "prettier" },  -- Change to:
+    javascript = { "deno_fmt" },
+    ```
+  </Accordion>
+
+  <Accordion title="Can I format only specific file extensions?">
+    Yes, use the full file type string:
+
+    ```lua
+    formatters_by_ft = {
+      ["javascript.jsx"] = { "prettier" },
+      ["typescript.tsx"] = { "prettier" },
+    },
+    ```
+  </Accordion>
+
+  <Accordion title="How do I disable formatting for a specific file?">
+    Add a comment at the top of the file:
+
+    ```javascript
+    // conform-disable
+    ```
+
+    Or use vim commands:
+    ```vim
+    :let b:disable_autoformat = 1
+    ```
+  </Accordion>
+
+  <Accordion title="What if I want LSP formatting only?">
+    Remove the formatter from `formatters_by_ft` and set `lsp_fallback = true`. The LSP server will handle formatting.
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [LSP Configuration](/plugins/lsp) - LSP fallback formatting
+- [Keymaps](/configuration/keymaps) - All keybindings

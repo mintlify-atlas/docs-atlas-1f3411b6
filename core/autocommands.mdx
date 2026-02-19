@@ -1,0 +1,282 @@
+---
+title: Autocommands
+description: Automatic commands and event handlers
+---
+
+nvim-luffy configures autocommands to enhance the editing experience with automatic behaviors. All autocommands are defined in `lua/leyland/core/autocommands.lua`.
+
+## What are Autocommands?
+
+Autocommands execute Vim commands automatically in response to specific events (like opening a file, entering insert mode, etc.).
+
+## Active Autocommands
+
+### Highlight on Yank
+
+<Accordion title="Visual feedback when yanking text">
+
+```lua
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("lazyvim_highlight_yank", { clear = true }),
+  callback = function()
+    (vim.hl or vim.highlight).on_yank()
+  end,
+})
+```
+
+**Event:** `TextYankPost` - Triggered after text is yanked (copied)
+
+**Behavior:** Briefly highlights the yanked text region
+
+**Group:** `lazyvim_highlight_yank`
+
+**Purpose:** Provides visual feedback showing exactly what text was yanked, making it easier to verify copy operations.
+
+**Example:**
+When you yank text with `yy`, `yiw`, or any yank command, the text briefly flashes to confirm the operation.
+
+**Customization:**
+
+```lua
+-- Change highlight duration (default is 150ms)
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
+  callback = function()
+    vim.highlight.on_yank({ timeout = 300 })  -- 300ms
+  end,
+})
+
+-- Change highlight color
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
+  callback = function()
+    vim.highlight.on_yank({ higroup = "IncSearch" })  -- use IncSearch highlight group
+  end,
+})
+
+-- Disable highlight on yank
+vim.api.nvim_create_augroup("lazyvim_highlight_yank", { clear = true })
+```
+
+</Accordion>
+
+### Auto-Clear Search Highlights
+
+<Accordion title="Automatically clear search highlights when cursor moves">
+
+```lua
+vim.api.nvim_create_autocmd("CursorMoved", {
+  group = vim.api.nvim_create_augroup("auto-hlsearch", { clear = true }),
+  callback = function()
+    if vim.v.hlsearch == 1 and vim.fn.searchcount().exact_match == 0 then
+      vim.schedule(function()
+        vim.cmd.nohlsearch()
+      end)
+    end
+  end,
+})
+```
+
+**Event:** `CursorMoved` - Triggered when the cursor moves in normal mode
+
+**Behavior:** Automatically clears search highlights when you move the cursor away from search matches
+
+**Group:** `auto-hlsearch`
+
+**Logic:**
+1. Checks if search highlighting is active (`vim.v.hlsearch == 1`)
+2. Checks if cursor is not on an exact match (`searchcount().exact_match == 0`)
+3. If both conditions are true, clears the search highlights
+
+**Purpose:** Keeps the interface clean by removing search highlights automatically, eliminating the need to manually run `:nohlsearch`.
+
+**Example:**
+1. Search for a word: `/function`
+2. All matches are highlighted
+3. Press `n` to jump to next match (highlights stay)
+4. Move cursor with `j`, `k`, `h`, `l`, etc.
+5. Highlights automatically clear
+
+**Customization:**
+
+```lua
+-- Disable auto-clear search highlights
+vim.api.nvim_create_augroup("auto-hlsearch", { clear = true })
+
+-- Clear highlights immediately without checking cursor position
+vim.api.nvim_create_autocmd("CursorMoved", {
+  group = vim.api.nvim_create_augroup("auto-hlsearch", { clear = true }),
+  callback = function()
+    if vim.v.hlsearch == 1 then
+      vim.cmd.nohlsearch()
+    end
+  end,
+})
+
+-- Add manual keymap to clear highlights (if you disable auto-clear)
+vim.keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+```
+
+</Accordion>
+
+## Autocommand Groups
+
+Both autocommands use autocommand groups to organize and manage them:
+
+```lua
+local function augroup(name)
+  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
+end
+```
+
+**Groups defined:**
+- `lazyvim_highlight_yank` - Manages yank highlighting
+- `auto-hlsearch` - Manages search highlight clearing
+
+**The `clear = true` option:** Clears any existing autocommands in the group before creating new ones, preventing duplicate autocommands.
+
+## Adding Custom Autocommands
+
+You can add your own autocommands after nvim-luffy loads:
+
+<Accordion title="Common autocommand examples">
+
+**Auto-save on focus lost:**
+
+```lua
+vim.api.nvim_create_autocmd("FocusLost", {
+  group = vim.api.nvim_create_augroup("auto_save", { clear = true }),
+  pattern = "*",
+  command = "silent! wa",
+  desc = "Save all files when focus is lost"
+})
+```
+
+**Remove trailing whitespace on save:**
+
+```lua
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("trim_whitespace", { clear = true }),
+  pattern = "*",
+  callback = function()
+    local save_cursor = vim.fn.getpos(".")
+    vim.cmd([[%s/\s\+$//e]])
+    vim.fn.setpos(".", save_cursor)
+  end,
+  desc = "Remove trailing whitespace before saving"
+})
+```
+
+**Restore cursor position when opening file:**
+
+```lua
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = vim.api.nvim_create_augroup("restore_cursor", { clear = true }),
+  pattern = "*",
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+  desc = "Restore cursor position"
+})
+```
+
+**Auto-format on save:**
+
+```lua
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("auto_format", { clear = true }),
+  pattern = "*",
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+  desc = "Format file before saving"
+})
+```
+
+**Set filetype-specific options:**
+
+```lua
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("filetype_settings", { clear = true }),
+  pattern = { "python", "lua" },
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+  end,
+  desc = "Use 4-space indentation for Python and Lua"
+})
+```
+
+**Close certain windows with 'q':**
+
+```lua
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("close_with_q", { clear = true }),
+  pattern = { "help", "qf", "man", "lspinfo" },
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
+  end,
+  desc = "Close help, quickfix, man pages with q"
+})
+```
+
+</Accordion>
+
+## Available Events
+
+Common autocommand events you can use:
+
+| Event | Description |
+|-------|-------------|
+| `BufEnter` | After entering a buffer |
+| `BufLeave` | Before leaving a buffer |
+| `BufWritePre` | Before writing a buffer to file |
+| `BufWritePost` | After writing a buffer to file |
+| `BufReadPost` | After reading a buffer from file |
+| `FileType` | When filetype is set |
+| `InsertEnter` | When entering insert mode |
+| `InsertLeave` | When leaving insert mode |
+| `TextYankPost` | After yanking text |
+| `CursorMoved` | When cursor moves in normal mode |
+| `CursorMovedI` | When cursor moves in insert mode |
+| `VimEnter` | After Vim starts |
+| `VimLeave` | Before Vim exits |
+| `FocusGained` | When Neovim gains focus |
+| `FocusLost` | When Neovim loses focus |
+| `WinEnter` | After entering a window |
+| `WinLeave` | Before leaving a window |
+| `LspAttach` | When LSP client attaches to buffer |
+
+## Autocommand Structure
+
+```lua
+vim.api.nvim_create_autocmd(event, {
+  group = group_name,           -- Optional: augroup for organization
+  pattern = pattern,            -- Files/filetypes to match
+  callback = function(args)     -- Lua function to execute
+    -- Your code here
+  end,
+  -- OR
+  command = "VimCommand",        -- Vim command string to execute
+  desc = "Description",          -- Optional: description for documentation
+  once = false,                 -- Run only once (default: false)
+  nested = false,               -- Allow nested autocommands (default: false)
+})
+```
+
+**Callback arguments:**
+
+```lua
+callback = function(args)
+  -- args.buf: buffer number
+  -- args.file: file name
+  -- args.match: matched pattern
+  -- args.event: event name
+  -- args.data: event-specific data
+end
+```

@@ -1,0 +1,152 @@
+---
+title: Project Structure
+description: Understanding nvim-luffy's directory structure and organization
+---
+
+## Overview
+
+nvim-luffy follows a modular architecture organized under the `leyland` namespace. The configuration is split into logical sections for better maintainability and clarity.
+
+## Directory Tree
+
+```text
+nvim-luffy/
+├── init.lua                    # Entry point, loads core modules
+├── lazy-lock.json             # Plugin version lock file
+├── README.md                  # Project documentation
+└── lua/
+    └── leyland/               # Main namespace
+        ├── core/              # Core configuration
+        │   ├── init.lua       # Loads core modules
+        │   ├── options.lua    # Neovim options (settings)
+        │   ├── keymaps.lua    # Global key mappings
+        │   └── autocommands.lua # Autocommands
+        ├── lazy.lua           # Lazy.nvim plugin manager setup
+        ├── lsp.lua            # LSP configuration loader
+        └── plugins/           # Plugin configurations
+            ├── init.lua       # Core plugins (plenary, tmux)
+            ├── lsp/           # LSP-specific plugins
+            │   ├── lsp.lua    # LSP client configuration
+            │   └── mason.lua  # Mason installer config
+            ├── alpha.lua      # Dashboard
+            ├── autopairs.lua  # Auto-pairing brackets
+            ├── colorscheme.lua # Theme configuration
+            ├── diffview.lua   # Git diff viewer
+            ├── flash.lua      # Motion/jump plugin
+            ├── formatting.lua # Code formatting
+            ├── harpoon.lua    # File navigation
+            ├── neogit.lua     # Git client
+            ├── nvim-cmp.lua   # Autocompletion
+            ├── nvim-tree.lua  # File explorer
+            ├── snacks.nvim    # UI enhancements
+            ├── telescope.lua  # Fuzzy finder
+            ├── treesitter.lua # Syntax parsing
+            └── trouble.lua    # Diagnostics list
+```
+
+## File Descriptions
+
+### Root Level
+
+#### `init.lua`
+The entry point of the configuration. It loads three main modules:
+```lua
+require("leyland.core")
+require("leyland.lazy")
+require("leyland.lsp")
+```
+
+#### `lazy-lock.json`
+Version lock file for all plugins managed by lazy.nvim. Ensures reproducible plugin installations across different machines.
+
+### Core Module (`lua/leyland/core/`)
+
+The core module handles fundamental Neovim configuration:
+
+- **`init.lua`**: Loads options, keymaps, and autocommands in sequence
+- **`options.lua`**: Sets Neovim options like line numbers, indentation, search behavior, etc.
+- **`keymaps.lua`**: Defines global key mappings for common operations
+- **`autocommands.lua`**: Configures automatic commands triggered by events
+
+### Plugin Manager (`lua/leyland/lazy.lua`)
+
+Sets up lazy.nvim plugin manager with:
+- Auto-installation if not present
+- Imports plugin specs from `leyland.plugins` and `leyland.plugins.lsp`
+- Enables plugin update checker (silent)
+- Disables change detection notifications
+
+### LSP Configuration (`lua/leyland/lsp.lua`)
+
+Loader for Language Server Protocol functionality, sourcing LSP-specific plugins.
+
+### Plugins Directory (`lua/leyland/plugins/`)
+
+Each file configures one or more related plugins:
+
+<AccordionGroup>
+  <Accordion title="UI & Navigation">
+    - **alpha.lua**: Dashboard displayed on startup
+    - **nvim-tree.lua**: File explorer sidebar
+    - **telescope.lua**: Fuzzy finder for files, grep, and more
+    - **flash.nvim**: Enhanced motion and jumping
+    - **harpoon.lua**: Quick file navigation marks
+    - **snacks.nvim**: Various UI enhancements and utilities
+  </Accordion>
+
+  <Accordion title="Editing & Code">
+    - **autopairs.lua**: Auto-close brackets and quotes
+    - **nvim-cmp.lua**: Completion engine with sources
+    - **formatting.lua**: Code formatting with conform.nvim
+    - **treesitter.lua**: Advanced syntax highlighting and code understanding
+  </Accordion>
+
+  <Accordion title="Git Integration">
+    - **neogit.lua**: Full-featured git client
+    - **diffview.lua**: Side-by-side diff viewer
+  </Accordion>
+
+  <Accordion title="LSP & Diagnostics">
+    - **lsp/lsp.lua**: LSP client configuration and keymaps
+    - **lsp/mason.lua**: LSP server installer and manager
+    - **trouble.lua**: Pretty diagnostics and quickfix list
+  </Accordion>
+
+  <Accordion title="Visual & Themes">
+    - **colorscheme.lua**: Theme configuration and selection
+  </Accordion>
+
+  <Accordion title="Core Dependencies">
+    - **init.lua**: Essential plugins (plenary, tmux-navigator)
+  </Accordion>
+</AccordionGroup>
+
+## Module Loading Order
+
+1. **Core Configuration**: Options → Keymaps → Autocommands
+2. **Plugin Manager**: lazy.nvim setup and plugin loading
+3. **LSP**: Language server configuration
+
+This order ensures that basic Neovim settings are configured before plugins load, and LSP is set up after the plugin manager initializes.
+
+## Naming Convention
+
+The configuration uses the `leyland` namespace throughout to avoid conflicts with other plugins or configurations. All modules are accessed via `require("leyland.*")`.
+
+## Plugin Specification Format
+
+Plugins are specified as Lua tables following lazy.nvim's format:
+
+```lua
+return {
+  "author/plugin-name",
+  dependencies = { "other/plugin" },
+  config = function()
+    -- Plugin setup
+  end,
+  keys = { ... },  -- Lazy-loaded on keymap
+  event = "...",   -- Lazy-loaded on event
+}
+```
+
+See individual plugin files for specific configurations.

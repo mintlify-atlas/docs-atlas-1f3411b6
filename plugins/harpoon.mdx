@@ -1,0 +1,335 @@
+---
+title: 'Harpoon'
+description: 'Quick navigation between your most important files'
+---
+
+Harpoon is a navigation plugin that allows you to mark and quickly jump between your most frequently used files. Think of it as "bookmarks for files" that persist across sessions.
+
+## Features
+
+- Mark up to 9 files for instant access
+- Quick menu to view and manage marked files
+- Persistent marks across sessions
+- Lightning-fast file switching
+- Full-width menu interface
+
+## Keymaps
+
+| Keymap | Action | Description |
+|--------|--------|-------------|
+| `<leader>H` | Harpoon File | Mark current file (add to harpoon list) |
+| `<leader>h` | Quick Menu | Open harpoon menu to view/select marked files |
+| `<leader>1` | Jump to File 1 | Jump to first marked file |
+| `<leader>2` | Jump to File 2 | Jump to second marked file |
+| `<leader>3` | Jump to File 3 | Jump to third marked file |
+| `<leader>4` | Jump to File 4 | Jump to fourth marked file |
+| `<leader>5` | Jump to File 5 | Jump to fifth marked file |
+| `<leader>6` | Jump to File 6 | Jump to sixth marked file |
+| `<leader>7` | Jump to File 7 | Jump to seventh marked file |
+| `<leader>8` | Jump to File 8 | Jump to eighth marked file |
+| `<leader>9` | Jump to File 9 | Jump to ninth marked file |
+
+## Configuration
+
+The Harpoon configuration is located at `lua/leyland/plugins/harpoon.lua`:
+
+```lua lua/leyland/plugins/harpoon.lua
+return {
+  "ThePrimeagen/harpoon",
+  branch = "harpoon2",
+  opts = {
+    menu = {
+      width = vim.api.nvim_win_get_width(0) - 4,
+    },
+    settings = {
+      save_on_toggle = true,
+    },
+  },
+  keys = function()
+    local keys = {
+      {
+        "<leader>H",
+        function()
+          require("harpoon"):list():add()
+        end,
+        desc = "Harpoon File",
+      },
+      {
+        "<leader>h",
+        function()
+          local harpoon = require("harpoon")
+          harpoon.ui:toggle_quick_menu(harpoon:list())
+        end,
+        desc = "Harpoon Quick Menu",
+      },
+    }
+
+    for i = 1, 9 do
+      table.insert(keys, {
+        "<leader>" .. i,
+        function()
+          require("harpoon"):list():select(i)
+        end,
+        desc = "Harpoon to File " .. i,
+      })
+    end
+    return keys
+  end,
+}
+```
+
+## Configuration Details
+
+### Menu Settings
+
+```lua
+menu = {
+  width = vim.api.nvim_win_get_width(0) - 4,
+}
+```
+
+The menu width is dynamically set to almost full window width (minus 4 characters for padding), providing a clear view of file paths.
+
+### Auto-save
+
+```lua
+settings = {
+  save_on_toggle = true,
+}
+```
+
+Marks are automatically saved when you toggle the menu, ensuring your harpooned files persist across sessions.
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Workflow">
+    A typical Harpoon workflow:
+    
+    ```
+    1. Open the file you use frequently (e.g., main.lua)
+    2. Press <leader>H (Space + Shift + h) to mark it
+    3. Open another important file (e.g., config.lua)
+    4. Press <leader>H to mark it too
+    5. Repeat for other important files
+    
+    Now you can:
+    - Press <leader>1 to jump to main.lua
+    - Press <leader>2 to jump to config.lua
+    - Press <leader>h to see all marked files
+    ```
+  </Tab>
+  
+  <Tab title="Quick Menu">
+    Using the Harpoon menu:
+    
+    ```
+    1. Press <leader>h (Space + h) to open the menu
+    2. You'll see a list of marked files:
+       
+       1: lua/leyland/core/init.lua
+       2: lua/leyland/plugins/telescope.lua
+       3: lua/leyland/core/keymaps.lua
+    
+    3. Press j/k to navigate
+    4. Press Enter to jump to that file
+    5. Press Esc or <leader>h again to close
+    ```
+    
+    The menu shows file paths relative to your project root.
+  </Tab>
+  
+  <Tab title="Managing Marks">
+    Adding and removing marks:
+    
+    **Add a mark:**
+    ```
+    1. Open the file
+    2. Press <leader>H
+    3. The file is now in your harpoon list
+    ```
+    
+    **Remove a mark:**
+    ```
+    1. Press <leader>h to open the menu
+    2. Navigate to the file you want to remove
+    3. Press 'd' to delete it from the list
+    ```
+    
+    **Reorder marks:**
+    ```
+    1. Open the menu with <leader>h
+    2. Cut and paste lines to reorder (use 'dd' and 'p')
+    3. Close the menu to save
+    ```
+  </Tab>
+  
+  <Tab title="Numeric Navigation">
+    The fastest way to navigate with Harpoon:
+    
+    ```
+    # Set up your most important files in order:
+    1. Main entry point      → <leader>1
+    2. Configuration         → <leader>2
+    3. Core logic           → <leader>3
+    4. Tests                → <leader>4
+    
+    # Then navigate instantly:
+    <leader>1  → Jump to entry point
+    <leader>2  → Jump to config
+    <leader>3  → Jump to core logic
+    <leader>4  → Jump to tests
+    ```
+    
+    This is much faster than Telescope for files you access constantly.
+  </Tab>
+</Tabs>
+
+## Harpoon vs Telescope
+
+### When to Use Harpoon
+
+- **Frequent files**: Files you open dozens of times per day
+- **Navigation speed**: Instant access with single keypress (`<leader>1`)
+- **Context switching**: Jumping between related files in a feature
+- **Persistent workflow**: Same files across multiple sessions
+
+### When to Use Telescope
+
+- **Finding files**: Files you don't access frequently
+- **Searching**: Don't remember exact filename
+- **One-off access**: Files you'll open once and close
+- **New codebases**: Exploring unfamiliar projects
+
+### Combined Workflow
+
+```
+1. Use Telescope to explore and find files
+2. When you find important files, mark them with Harpoon
+3. Use Harpoon for quick navigation between those files
+4. Use Telescope again to find new files
+```
+
+## Tips and Tricks
+
+1. **Organize by frequency**: Put your most-accessed file in position 1
+2. **Related files together**: Group files from the same feature in adjacent positions
+3. **Test alongside code**: Mark the source file and its test file
+4. **Clean regularly**: Remove marks you're no longer using
+5. **Project-specific marks**: Marks are per-project, so customize for each codebase
+
+## Advanced Usage
+
+### Mark Current Position
+
+Harpoon marks not just the file, but also your cursor position:
+
+```lua
+-- Jump to marked file AND the exact line you were on
+<leader>1
+```
+
+### Programmatic Access
+
+You can interact with Harpoon programmatically:
+
+```lua
+local harpoon = require("harpoon")
+
+-- Add current file
+harpoon:list():add()
+
+-- Select file at index
+harpoon:list():select(1)
+
+-- Remove current file
+harpoon:list():remove()
+
+-- Clear all marks
+harpoon:list():clear()
+```
+
+### Custom Keymaps
+
+Add additional keymaps for Harpoon operations:
+
+```lua
+-- Navigate to next/previous marked file
+vim.keymap.set("n", "<C-n>", function()
+  require("harpoon"):list():next()
+end)
+
+vim.keymap.set("n", "<C-p>", function()
+  require("harpoon"):list():prev()
+end)
+```
+
+## Workflow Examples
+
+### Feature Development
+
+```
+Mark these files:
+1. feature.lua       (implementation)
+2. feature_test.lua  (tests)
+3. types.lua         (type definitions)
+4. docs.md          (documentation)
+
+Now rapidly cycle through:
+<leader>1 → Write code
+<leader>2 → Write tests
+<leader>1 → Fix code
+<leader>2 → Run tests
+```
+
+### Full-Stack Development
+
+```
+Mark these files:
+1. routes/api.ts     (backend)
+2. handlers.ts       (logic)
+3. components/App.tsx (frontend)
+4. types.ts          (shared types)
+
+Jump between layers instantly:
+<leader>1 → Define API
+<leader>3 → Call API from frontend
+<leader>2 → Implement handler
+<leader>4 → Update types
+```
+
+### Code Review
+
+```
+Mark these files:
+1. main.lua          (entry point)
+2. changed_file_1.lua
+3. changed_file_2.lua
+4. tests.lua
+
+Review systematically:
+<leader>1 → Understand context
+<leader>2 → Review change 1
+<leader>3 → Review change 2
+<leader>4 → Verify tests
+```
+
+## Troubleshooting
+
+### Marks Not Persisting
+
+- Ensure `save_on_toggle = true` is set in settings
+- Check that you're closing the menu properly (Esc or `<leader>h`)
+- Marks are per-project based on the working directory
+
+### Can't Remove a Mark
+
+- Open the menu with `<leader>h`
+- Use `dd` to delete the line
+- Or use `:lua require("harpoon"):list():remove()`
+
+### Wrong File Opens
+
+- Check the menu to see the current order
+- Files may have been reordered
+- Remove and re-add marks to reset positions

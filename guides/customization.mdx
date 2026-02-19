@@ -1,0 +1,308 @@
+---
+title: 'Customization Guide'
+description: 'Learn how to customize nvim-luffy to match your preferences'
+---
+
+## Overview
+
+nvim-luffy is designed to be highly customizable. This guide covers the main areas you can customize to make the configuration your own.
+
+## Directory Structure
+
+Understanding the directory structure helps you navigate the configuration:
+
+```
+lua/leyland/
+├── core/              # Core configuration
+│   ├── init.lua       # Core module loader
+│   ├── options.lua    # Vim options
+│   ├── keymaps.lua    # Global keymaps
+│   └── autocommands.lua # Autocommands
+├── plugins/           # Plugin specifications
+│   ├── lsp/          # LSP-related plugins
+│   └── *.lua         # Individual plugin configs
+├── lazy.lua          # Lazy.nvim setup
+└── lsp.lua           # LSP keybindings and config
+```
+
+## Customizing Options
+
+### Basic Vim Settings
+
+Edit `lua/leyland/core/options.lua` to customize Vim behavior:
+
+<Steps>
+  <Step title="Open the options file">
+    Open `lua/leyland/core/options.lua` in your editor.
+  </Step>
+  
+  <Step title="Modify settings">
+    Change any settings to match your preferences.
+  </Step>
+  
+  <Step title="Reload configuration">
+    Restart Neovim or run `:source $MYVIMRC` to apply changes.
+  </Step>
+</Steps>
+
+#### Example: Line Numbers
+
+**Before:**
+```lua
+opt.relativenumber = true
+opt.number = true
+```
+
+**After (absolute line numbers only):**
+```lua
+opt.relativenumber = false
+opt.number = true
+```
+
+#### Example: Tab Settings
+
+**Before:**
+```lua
+opt.tabstop = 2
+opt.shiftwidth = 2
+opt.expandtab = true
+```
+
+**After (4 spaces for tabs):**
+```lua
+opt.tabstop = 4
+opt.shiftwidth = 4
+opt.expandtab = true
+```
+
+### Common Options to Customize
+
+<AccordionGroup>
+  <Accordion title="Display Options">
+    ```lua
+    opt.relativenumber = true     -- Show relative line numbers
+    opt.number = true             -- Show current line number
+    opt.wrap = false             -- Disable line wrapping
+    opt.signcolumn = "yes"        -- Always show sign column
+    opt.cursorline = true        -- Highlight current line
+    ```
+  </Accordion>
+  
+  <Accordion title="Search Options">
+    ```lua
+    opt.ignorecase = true        -- Case insensitive search
+    opt.smartcase = true         -- Case sensitive if uppercase present
+    opt.hlsearch = true          -- Highlight search results
+    ```
+  </Accordion>
+  
+  <Accordion title="Window Behavior">
+    ```lua
+    opt.splitright = true        -- Split vertical windows to the right
+    opt.splitbelow = true        -- Split horizontal windows below
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Use `:help option-name` in Neovim to learn more about any option (e.g., `:help relativenumber`).
+</Tip>
+
+## Changing the Colorscheme
+
+The configuration includes multiple colorschemes. To change the active theme:
+
+<Steps>
+  <Step title="Open colorscheme configuration">
+    Edit `lua/leyland/plugins/colorscheme.lua`.
+  </Step>
+  
+  <Step title="Change the active colorscheme">
+    Find the `config` function in the rose-pine plugin spec and change the colorscheme name.
+  </Step>
+  
+  <Step title="Restart Neovim">
+    Restart Neovim to apply the new colorscheme.
+  </Step>
+</Steps>
+
+### Available Colorschemes
+
+The following colorschemes are pre-installed:
+
+- `bamboo` (default)
+- `catppuccin`
+- `tokyonight`
+- `modus`
+- `onedark`
+- `rose-pine`
+
+**Example:**
+```lua
+config = function()
+  -- Change from bamboo to catppuccin
+  vim.cmd.colorscheme("catppuccin")
+end,
+```
+
+<Tip>
+  You can also change colorschemes temporarily by running `:colorscheme catppuccin` in Neovim.
+</Tip>
+
+## Customizing the Leader Key
+
+The leader key is set to `<Space>` by default in `lua/leyland/core/keymaps.lua`:
+
+```lua
+vim.g.mapleader = " "
+```
+
+**To change it:**
+```lua
+-- Change leader to comma
+vim.g.mapleader = ","
+```
+
+<Warning>
+  The leader key must be set before any keymaps that use it. Keep it at the top of the keymaps file.
+</Warning>
+
+## Adjusting Window Behavior
+
+Customize how windows and buffers behave:
+
+### Status Line
+
+The configuration uses a minimal winbar. To customize it, edit `lua/leyland/core/options.lua`:
+
+**Before:**
+```lua
+opt.laststatus = 0  -- Hide the statusline
+opt.winbar = "%f %h%m%r%=%l,%c %P"
+```
+
+**After (show full path):**
+```lua
+opt.laststatus = 0
+opt.winbar = "%F %h%m%r%=%l,%c %P"  -- %F shows full path
+```
+
+### Command Height
+
+**Before:**
+```lua
+opt.cmdheight = 0  -- Hide command line
+```
+
+**After (show command line):**
+```lua
+opt.cmdheight = 1  -- Show command line
+```
+
+## LSP Diagnostic Configuration
+
+Customize how diagnostics are displayed in `lua/leyland/lsp.lua`:
+
+### Diagnostic Symbols
+
+**Example: Change diagnostic icons**
+```lua
+vim.diagnostic.config({
+  underline = {
+    severity = { min = severity.ERROR },
+  },
+  signs = {
+    text = {
+      [severity.ERROR] = "✘",  -- Custom error icon
+      [severity.WARN] = "▲",   -- Custom warning icon
+      [severity.HINT] = "⚑",   -- Custom hint icon
+      [severity.INFO] = "»",   -- Custom info icon
+    },
+  },
+})
+```
+
+### Show More Diagnostics
+
+**Before (only errors underlined):**
+```lua
+underline = {
+  severity = { min = severity.ERROR },
+},
+```
+
+**After (errors and warnings underlined):**
+```lua
+underline = {
+  severity = { min = severity.WARN },
+},
+```
+
+## Plugin-Specific Customization
+
+Each plugin has its own configuration file in `lua/leyland/plugins/`. Here are some common customizations:
+
+### Telescope Settings
+
+Edit `lua/leyland/plugins/telescope.lua` to customize the fuzzy finder:
+
+```lua
+telescope.setup({
+  defaults = {
+    path_display = { "smart" },  -- Change from "filename_first"
+    layout_strategy = "vertical", -- Vertical layout
+    layout_config = {
+      height = 0.95,
+      width = 0.95,
+    },
+  },
+})
+```
+
+### Autocompletion Behavior
+
+Edit `lua/leyland/plugins/nvim-cmp.lua` to customize completion:
+
+**Example: Auto-select first item**
+```lua
+mapping = cmp.mapping.preset.insert({
+  ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Changed from false
+  -- ... other mappings
+}),
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start Small" icon="seedling">
+    Make one change at a time and test it before moving on.
+  </Card>
+  
+  <Card title="Keep Backups" icon="floppy-disk">
+    Use version control (git) to track your changes.
+  </Card>
+  
+  <Card title="Read Documentation" icon="book">
+    Use `:help` to understand what options do before changing them.
+  </Card>
+  
+  <Card title="Check Examples" icon="code">
+    Look at other plugin configurations for inspiration.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Add Plugins" href="/guides/adding-plugins" icon="plug">
+    Learn how to install and configure new plugins
+  </Card>
+  
+  <Card title="Customize Keybindings" href="/guides/keybindings" icon="keyboard">
+    Set up your own keyboard shortcuts
+  </Card>
+  
+  <Card title="Configure LSP" href="/guides/lsp-configuration" icon="server">
+    Add language servers for your programming languages
+  </Card>
+</CardGroup>

@@ -1,0 +1,610 @@
+---
+title: 'LSP Configuration'
+description: 'Learn how to configure and add Language Server Protocol (LSP) servers'
+---
+
+## Overview
+
+Language Server Protocol (LSP) provides IDE-like features in Neovim: code completion, diagnostics, go-to-definition, and more. nvim-luffy uses Mason to manage LSP servers.
+
+## How LSP Works in nvim-luffy
+
+The LSP setup consists of three main components:
+
+1. **mason.nvim** - Manages LSP server installations
+2. **nvim-lspconfig** - Configures LSP servers
+3. **cmp-nvim-lsp** - Integrates LSP with autocompletion
+
+### Files Involved
+
+- `lua/leyland/plugins/lsp/mason.lua` - Mason and server installation
+- `lua/leyland/plugins/lsp/lsp.lua` - LSP capabilities setup
+- `lua/leyland/lsp.lua` - LSP keybindings and diagnostics
+
+## Pre-installed Language Servers
+
+The configuration comes with these LSP servers pre-configured:
+
+<AccordionGroup>
+  <Accordion title="Web Development">
+    - `ts_ls` - TypeScript/JavaScript
+    - `html` - HTML
+    - `cssls` - CSS
+    - `tailwindcss` - Tailwind CSS
+    - `svelte` - Svelte
+    - `emmet_ls` - Emmet
+    - `graphql` - GraphQL
+    - `eslint` - ESLint
+  </Accordion>
+  
+  <Accordion title="Backend & Scripting">
+    - `lua_ls` - Lua
+    - `pyright` - Python
+    - `prismals` - Prisma
+  </Accordion>
+</AccordionGroup>
+
+## Installing Additional LSP Servers
+
+<Steps>
+  <Step title="Open Mason configuration">
+    Edit `lua/leyland/plugins/lsp/mason.lua`
+  </Step>
+  
+  <Step title="Add server to ensure_installed">
+    Add the server name to the `ensure_installed` table.
+  </Step>
+  
+  <Step title="Restart Neovim">
+    Restart Neovim. Mason will automatically install the new server.
+  </Step>
+  
+  <Step title="Verify installation">
+    Run `:Mason` to check the installation status.
+  </Step>
+</Steps>
+
+### Example: Adding Rust LSP
+
+**Before:**
+```lua
+opts = {
+  ensure_installed = {
+    "ts_ls",
+    "html",
+    -- other servers...
+  },
+},
+```
+
+**After:**
+```lua
+opts = {
+  ensure_installed = {
+    "ts_ls",
+    "html",
+    "rust_analyzer",  -- Added Rust language server
+    -- other servers...
+  },
+},
+```
+
+### Example: Adding Go LSP
+
+```lua
+opts = {
+  ensure_installed = {
+    "ts_ls",
+    "html",
+    "gopls",  -- Go language server
+    -- other servers...
+  },
+},
+```
+
+## Finding Available LSP Servers
+
+To see all available LSP servers:
+
+1. Run `:Mason` in Neovim
+2. Press `2` to filter by "LSP"
+3. Browse the list of available servers
+4. Press `i` on a server to install it
+
+Or visit the [nvim-lspconfig server configurations](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md) documentation.
+
+## Configuring Language Servers
+
+Most servers work out of the box, but some need custom configuration.
+
+### Method 1: Using lspconfig
+
+For servers needing custom settings, configure them in `lua/leyland/plugins/lsp/lsp.lua`:
+
+**Example: Configure lua_ls for Neovim development**
+
+```lua
+return {
+  "hrsh7th/cmp-nvim-lsp",
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    { "antosha417/nvim-lsp-file-operations", config = true },
+    { "folke/lazydev.nvim", opts = {} },
+  },
+  config = function()
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    local capabilities = cmp_nvim_lsp.default_capabilities()
+
+    -- Configure all servers with default capabilities
+    vim.lsp.config("*", {
+      capabilities = capabilities,
+    })
+    
+    -- Add custom configuration for lua_ls
+    vim.lsp.config("lua_ls", {
+      capabilities = capabilities,
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },  -- Recognize 'vim' global
+          },
+          workspace = {
+            library = vim.api.nvim_get_runtime_file("", true),
+            checkThirdParty = false,
+          },
+        },
+      },
+    })
+  end,
+}
+```
+
+### Method 2: Using mason-lspconfig handlers
+
+For more complex setups, use handlers in `mason.lua`:
+
+```lua
+return {
+  {
+    "williamboman/mason-lspconfig.nvim",
+    opts = {
+      ensure_installed = {
+        "ts_ls",
+        "rust_analyzer",
+        -- other servers...
+      },
+      handlers = {
+        -- Default handler
+        function(server_name)
+          require("lspconfig")[server_name].setup({})
+        end,
+        
+        -- Custom handler for rust_analyzer
+        ["rust_analyzer"] = function()
+          require("lspconfig").rust_analyzer.setup({
+            settings = {
+              ["rust-analyzer"] = {
+                checkOnSave = {
+                  command = "clippy",
+                },
+              },
+            },
+          })
+        end,
+      },
+    },
+    dependencies = {
+      -- ...
+    },
+  },
+}
+```
+
+## Common Server Configurations
+
+### TypeScript/JavaScript (ts_ls)
+
+```lua
+vim.lsp.config("ts_ls", {
+  capabilities = capabilities,
+  settings = {
+    typescript = {
+      inlayHints = {
+        includeInlayParameterNameHints = "all",
+        includeInlayFunctionParameterTypeHints = true,
+      },
+    },
+  },
+})
+```
+
+### Python (pyright)
+
+```lua
+vim.lsp.config("pyright", {
+  capabilities = capabilities,
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "workspace",
+      },
+    },
+  },
+})
+```
+
+### JSON (jsonls)
+
+```lua
+vim.lsp.config("jsonls", {
+  capabilities = capabilities,
+  settings = {
+    json = {
+      schemas = require("schemastore").json.schemas(),
+      validate = { enable = true },
+    },
+  },
+})
+```
+
+<Tip>
+  For JSON schemas, install the `b0o/schemastore.nvim` plugin for automatic schema detection.
+</Tip>
+
+## LSP Keybindings
+
+LSP keybindings are automatically set when an LSP server attaches. They're defined in `lua/leyland/lsp.lua`.
+
+### Default LSP Keybindings
+
+<CardGroup cols={2}>
+  <Card title="Code Navigation" icon="map">
+    - `gR` - Show references (Telescope)
+    - `gd` - Go to definition
+    - `gi` - Show implementations
+    - `gt` - Show type definitions
+  </Card>
+  
+  <Card title="Code Actions" icon="wand-magic-sparkles">
+    - `<leader>ca` - Code actions
+    - `<leader>rn` - Rename symbol
+    - `K` - Show hover documentation
+  </Card>
+  
+  <Card title="Diagnostics" icon="stethoscope">
+    - `<leader>D` - Buffer diagnostics
+    - `<leader>d` - Line diagnostics
+    - `[d` - Previous diagnostic
+    - `]d` - Next diagnostic
+  </Card>
+  
+  <Card title="LSP Management" icon="server">
+    - `<leader>rs` - Restart LSP
+  </Card>
+</CardGroup>
+
+### Customizing LSP Keybindings
+
+Edit `lua/leyland/lsp.lua` to customize LSP keybindings:
+
+```lua
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf, silent = true }
+    local keymap = vim.keymap
+    
+    -- Add your custom LSP keybindings here
+    opts.desc = "Format document"
+    keymap.set("n", "<leader>lf", vim.lsp.buf.format, opts)
+    
+    opts.desc = "Signature help"
+    keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, opts)
+  end,
+})
+```
+
+## Diagnostic Configuration
+
+Diagnostics show errors, warnings, and hints in your code.
+
+### Customizing Diagnostic Signs
+
+Edit the signs in `lua/leyland/lsp.lua`:
+
+**Before:**
+```lua
+signs = {
+  text = {
+    [severity.ERROR] = " ",
+    [severity.WARN] = " ",
+    [severity.HINT] = "󰠠 ",
+    [severity.INFO] = " ",
+  },
+},
+```
+
+**After (text-based signs):**
+```lua
+signs = {
+  text = {
+    [severity.ERROR] = "E",
+    [severity.WARN] = "W",
+    [severity.HINT] = "H",
+    [severity.INFO] = "I",
+  },
+},
+```
+
+### Adjusting Diagnostic Severity
+
+Control which diagnostics are shown:
+
+```lua
+vim.diagnostic.config({
+  -- Show all severities
+  underline = true,
+  
+  -- Only show errors and warnings
+  underline = {
+    severity = { min = vim.diagnostic.severity.WARN },
+  },
+  
+  -- Disable virtual text (inline diagnostics)
+  virtual_text = false,
+  
+  -- Show diagnostics in floating window on cursor hold
+  float = {
+    source = "always",  -- Show source
+    border = "rounded",
+  },
+})
+```
+
+### Auto-show Diagnostics on Cursor Hold
+
+```lua
+-- In lua/leyland/core/autocommands.lua or lua/leyland/lsp.lua
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false })
+  end,
+})
+```
+
+## Formatting Configuration
+
+The configuration uses `conform.nvim` for formatting, configured in `lua/leyland/plugins/formatting.lua`.
+
+### Adding Formatters
+
+<Steps>
+  <Step title="Install the formatter via Mason">
+    Add the formatter to `mason-tool-installer` in `lua/leyland/plugins/lsp/mason.lua`:
+    
+    ```lua
+    {
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
+      opts = {
+        ensure_installed = {
+          "prettier",
+          "stylua",
+          "shfmt",  -- Added shell script formatter
+        },
+      },
+    }
+    ```
+  </Step>
+  
+  <Step title="Configure the formatter">
+    Add the formatter to `formatters_by_ft` in `lua/leyland/plugins/formatting.lua`:
+    
+    ```lua
+    formatters_by_ft = {
+      javascript = { "prettier" },
+      typescript = { "prettier" },
+      sh = { "shfmt" },  -- Added shell script formatting
+      bash = { "shfmt" },
+    },
+    ```
+  </Step>
+  
+  <Step title="Restart Neovim">
+    Restart Neovim. The formatter will be installed and configured.
+  </Step>
+</Steps>
+
+### Format on Save
+
+Format on save is enabled by default:
+
+```lua
+format_on_save = {
+  lsp_fallback = true,  -- Use LSP if no formatter available
+  async = false,
+  timeout_ms = 3000,
+}
+```
+
+**To disable format on save:**
+```lua
+format_on_save = false,
+```
+
+**To enable only for specific filetypes:**
+```lua
+format_on_save = function(bufnr)
+  -- Disable for JavaScript files
+  if vim.bo[bufnr].filetype == "javascript" then
+    return false
+  end
+  return { lsp_fallback = true, timeout_ms = 3000 }
+end,
+```
+
+### Manual Formatting
+
+Use `<leader>mp` to manually format the file or selection.
+
+## Linters Configuration
+
+Linters are installed via Mason. Add them to `mason-tool-installer`:
+
+```lua
+{
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  opts = {
+    ensure_installed = {
+      "prettier",
+      "stylua",
+      "eslint_d",  -- JavaScript linter
+      "pylint",    -- Python linter
+      "shellcheck", -- Shell script linter
+    },
+  },
+}
+```
+
+<Tip>
+  To configure linters, you'll need to add the `nvim-lint` plugin. See the [nvim-lint documentation](https://github.com/mfussenegger/nvim-lint) for setup instructions.
+</Tip>
+
+## Advanced LSP Features
+
+### Inlay Hints
+
+Inlay hints show parameter names and type information inline:
+
+```lua
+-- In lua/leyland/lsp.lua (commented out by default)
+vim.lsp.inlay_hint.enable(true)
+```
+
+### Code Lens
+
+Some language servers support code lens (actions above functions/classes):
+
+```lua
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
+  callback = function()
+    vim.lsp.codelens.refresh()
+  end,
+})
+
+-- Keymap to run code lens
+vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, {
+  desc = "Run code lens",
+})
+```
+
+### Workspace Folders
+
+Manage multi-root workspaces:
+
+```lua
+-- Add workspace folder
+vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, {
+  desc = "Add workspace folder",
+})
+
+-- Remove workspace folder
+vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, {
+  desc = "Remove workspace folder",
+})
+
+-- List workspace folders
+vim.keymap.set("n", "<leader>wl", function()
+  print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+end, {
+  desc = "List workspace folders",
+})
+```
+
+## Troubleshooting LSP
+
+<AccordionGroup>
+  <Accordion title="LSP server not starting">
+    - Check if the server is installed: `:Mason`
+    - Check LSP logs: `:LspLog`
+    - Verify the server is configured: `:LspInfo`
+    - Check for errors: `:messages`
+  </Accordion>
+  
+  <Accordion title="No completions showing">
+    - Verify the LSP server is attached: `:LspInfo`
+    - Check that `cmp-nvim-lsp` is installed
+    - Ensure the language server supports completion
+    - Try manually triggering completion with `<C-Space>`
+  </Accordion>
+  
+  <Accordion title="Formatting not working">
+    - Check if a formatter is configured for the filetype
+    - Run `:Mason` to verify the formatter is installed
+    - Try manual formatting with `<leader>mp`
+    - Check `:ConformInfo` for formatter status
+  </Accordion>
+  
+  <Accordion title="Diagnostics not showing">
+    - Run `:LspInfo` to check if LSP is attached
+    - Check diagnostic configuration in `lua/leyland/lsp.lua`
+    - Try `:lua vim.diagnostic.show()`
+  </Accordion>
+</AccordionGroup>
+
+### Viewing LSP Logs
+
+To debug LSP issues:
+
+```vim
+:LspLog       " Open LSP log file
+:set verbose=15  " Enable verbose logging
+:LspInfo      " Show attached LSP servers
+```
+
+### Restarting LSP
+
+If the LSP server gets stuck:
+
+```vim
+:LspRestart   " Restart all LSP servers
+```
+
+Or use the keymap: `<leader>rs`
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Install What You Need" icon="download">
+    Only install language servers for languages you actively use.
+  </Card>
+  
+  <Card title="Use Project-Local Config" icon="folder">
+    Use `.luarc.json` or similar for project-specific LSP settings.
+  </Card>
+  
+  <Card title="Format on Save" icon="floppy-disk">
+    Enable format on save for consistent code style.
+  </Card>
+  
+  <Card title="Learn LSP Commands" icon="graduation-cap">
+    Familiarize yourself with LSP keybindings for productivity.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Some language servers can be resource-intensive. If you experience slowdowns, consider disabling unused servers or adjusting their settings.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Customize Keybindings" href="/guides/keybindings" icon="keyboard">
+    Learn how to customize LSP keybindings
+  </Card>
+  
+  <Card title="Add Plugins" href="/guides/adding-plugins" icon="plug">
+    Add complementary plugins for better language support
+  </Card>
+</CardGroup>

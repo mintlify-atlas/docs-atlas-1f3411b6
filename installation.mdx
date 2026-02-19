@@ -1,0 +1,355 @@
+---
+title: 'Installation'
+description: 'Get nvim-luffy up and running on your system'
+---
+
+## Prerequisites
+
+Before installing nvim-luffy, ensure you have the following installed on your system:
+
+<Steps>
+  <Step title="Install Neovim 0.9+">
+    nvim-luffy requires Neovim 0.9 or higher for full functionality.
+
+    <CodeGroup>
+    ```bash macOS
+    brew install neovim
+    ```
+
+    ```bash Ubuntu/Debian
+    sudo apt install neovim
+    ```
+
+    ```bash Arch Linux
+    sudo pacman -S neovim
+    ```
+
+    ```bash From Source
+    git clone https://github.com/neovim/neovim
+    cd neovim
+    make CMAKE_BUILD_TYPE=RelWithDebInfo
+    sudo make install
+    ```
+    </CodeGroup>
+
+    Verify your installation:
+    ```bash
+    nvim --version
+    ```
+
+    <Note>
+      Make sure the version is 0.9.0 or higher. If you have an older version, update it before proceeding.
+    </Note>
+  </Step>
+
+  <Step title="Install Required Dependencies">
+    nvim-luffy requires several system dependencies for full functionality:
+
+    <CodeGroup>
+    ```bash macOS
+    # Git (required)
+    brew install git
+
+    # Telescope dependencies
+    brew install ripgrep fd
+
+    # Clipboard support
+    # (Already available on macOS)
+
+    # Optional: for better performance
+    brew install fzf
+    ```
+
+    ```bash Ubuntu/Debian
+    # Git (required)
+    sudo apt install git
+
+    # Telescope dependencies
+    sudo apt install ripgrep fd-find
+
+    # Clipboard support
+    sudo apt install xclip  # or xsel
+
+    # Build tools for telescope-fzf-native
+    sudo apt install build-essential
+    ```
+
+    ```bash Arch Linux
+    # Git (required)
+    sudo pacman -S git
+
+    # Telescope dependencies
+    sudo pacman -S ripgrep fd
+
+    # Clipboard support
+    sudo pacman -S xclip  # or xsel
+
+    # Build tools
+    sudo pacman -S base-devel
+    ```
+    </CodeGroup>
+
+    <Tip>
+      **ripgrep** and **fd** significantly improve Telescope's search performance. While optional, they're highly recommended.
+    </Tip>
+  </Step>
+
+  <Step title="Install a Nerd Font">
+    nvim-luffy uses icons from Nerd Fonts for a beautiful UI. Install a Nerd Font and configure your terminal to use it.
+
+    **Recommended fonts:**
+    - [JetBrains Mono Nerd Font](https://www.nerdfonts.com/font-downloads)
+    - [Fira Code Nerd Font](https://www.nerdfonts.com/font-downloads)
+    - [Hack Nerd Font](https://www.nerdfonts.com/font-downloads)
+
+    <CodeGroup>
+    ```bash macOS (Homebrew)
+    brew tap homebrew/cask-fonts
+    brew install font-jetbrains-mono-nerd-font
+    ```
+
+    ```bash Manual Installation
+    # Download from https://www.nerdfonts.com/font-downloads
+    # Extract and install the font files
+    # Configure your terminal to use the font
+    ```
+    </CodeGroup>
+
+    <Warning>
+      Without a Nerd Font, icons will appear as squares or question marks. Make sure to configure your terminal emulator to use the installed Nerd Font.
+    </Warning>
+  </Step>
+
+  <Step title="Backup Existing Configuration">
+    If you have an existing Neovim configuration, back it up before proceeding:
+
+    ```bash
+    # Backup your existing config
+    mv ~/.config/nvim ~/.config/nvim.backup
+    mv ~/.local/share/nvim ~/.local/share/nvim.backup
+    mv ~/.cache/nvim ~/.cache/nvim.backup
+    ```
+
+    <Note>
+      You can restore your old configuration later by reversing these commands.
+    </Note>
+  </Step>
+
+  <Step title="Clone nvim-luffy">
+    Clone the nvim-luffy repository into your Neovim configuration directory:
+
+    ```bash
+    git clone https://github.com/yourusername/nvim-luffy.git ~/.config/nvim
+    ```
+
+    <Tip>
+      Replace `yourusername` with the actual repository path for nvim-luffy.
+    </Tip>
+  </Step>
+
+  <Step title="Launch Neovim">
+    Start Neovim to trigger the automatic installation:
+
+    ```bash
+    nvim
+    ```
+
+    On first launch, lazy.nvim will automatically:
+    1. Bootstrap itself if not already installed
+    2. Download and install all configured plugins
+    3. Compile Telescope's fzf native extension
+    4. Load your configuration
+
+    **What you'll see:**
+    - A window showing plugin installation progress
+    - Plugins being downloaded and compiled
+    - This may take 1-3 minutes depending on your internet speed
+
+    <Warning>
+      Don't close Neovim during the initial setup. Wait for all plugins to finish installing.
+    </Warning>
+  </Step>
+
+  <Step title="Install Language Servers">
+    After plugins are installed, open Mason to install language servers:
+
+    ```vim
+    :Mason
+    ```
+
+    The following servers are pre-configured and will auto-install:
+    - `ts_ls` - TypeScript/JavaScript
+    - `html` - HTML
+    - `cssls` - CSS
+    - `tailwindcss` - Tailwind CSS
+    - `lua_ls` - Lua
+    - `pyright` - Python
+    - `eslint` - ESLint
+    - And more...
+
+    Mason will also install formatters and linters:
+    - **Prettier** - JS/TS/CSS/HTML formatting
+    - **Stylua** - Lua formatting
+    - **Black** - Python formatting
+    - **isort** - Python import sorting
+    - **eslint_d** - Fast ESLint
+
+    <Note>
+      Mason installations happen automatically based on the configuration in `lua/leyland/plugins/lsp/mason.lua`. You can customize this list to add or remove tools.
+    </Note>
+  </Step>
+
+  <Step title="Install Treesitter Parsers">
+    Treesitter parsers will install automatically, but you can manually trigger updates:
+
+    ```vim
+    :TSUpdate
+    ```
+
+    Pre-configured parsers include:
+    - JavaScript, TypeScript, TSX
+    - HTML, CSS
+    - Lua, Vim
+    - Python, Bash
+    - Markdown, JSON, YAML
+    - And more...
+
+    <Tip>
+      To add support for additional languages, edit `lua/leyland/plugins/treesitter.lua` and add the language to the `ensure_installed` list.
+    </Tip>
+  </Step>
+
+  <Step title="Verify Installation">
+    Restart Neovim and verify everything is working:
+
+    ```bash
+    nvim
+    ```
+
+    You should see:
+    - The One Piece-themed Alpha dashboard
+    - No error messages
+    - Syntax highlighting working
+    - Icons displaying correctly
+
+    Test basic functionality:
+    ```vim
+    # Test Telescope
+    <Space><Space>  # Fuzzy find files
+
+    # Test LSP (in a code file)
+    K  # Show hover documentation
+
+    # Test file explorer
+    <Space>e  # Toggle nvim-tree
+
+    # Check plugin status
+    :Lazy
+
+    # Check LSP status
+    :LspInfo
+    ```
+
+    <Tip>
+      If you encounter any issues, check the [Troubleshooting Guide](/guides/troubleshooting) for common problems and solutions.
+    </Tip>
+  </Step>
+</Steps>
+
+## Installation Complete!
+
+Your nvim-luffy configuration is now ready to use. Here's what to do next:
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start Guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Learn the essential keybindings and get productive fast
+  </Card>
+  <Card
+    title="Configuration"
+    icon="gear"
+    href="/guides/customization"
+  >
+    Customize themes, keybindings, and plugin settings
+  </Card>
+  <Card
+    title="Plugin Reference"
+    icon="book"
+    href="/plugins/overview"
+  >
+    Deep dive into each plugin's features and configuration
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/reference/troubleshooting"
+  >
+    Solutions to common installation and runtime issues
+  </Card>
+</CardGroup>
+
+## Optional Enhancements
+
+### Enable True Color Support
+
+For the best visual experience, enable true color in your terminal:
+
+<CodeGroup>
+```bash Alacritty
+# In ~/.config/alacritty/alacritty.yml
+env:
+  TERM: xterm-256color
+```
+
+```bash Kitty
+# In ~/.config/kitty/kitty.conf
+term xterm-256color
+```
+
+```bash iTerm2
+# Preferences > Profiles > Terminal
+# Set "Report Terminal Type" to "xterm-256color"
+```
+</CodeGroup>
+
+### Install Additional Tools
+
+Enhance your development experience with these optional tools:
+
+```bash
+# Better file watching (for auto-reload)
+npm install -g watchman
+
+# Better git diffs
+brew install git-delta  # or apt install git-delta
+
+# Additional LSP servers (via Mason)
+:MasonInstall rust-analyzer  # Rust
+:MasonInstall gopls          # Go
+:MasonInstall clangd         # C/C++
+```
+
+<Note>
+  These tools are optional but can enhance specific workflows. Install them as needed for your development stack.
+</Note>
+
+## Updating nvim-luffy
+
+To update your configuration to the latest version:
+
+```bash
+cd ~/.config/nvim
+git pull origin main
+
+# Then in Neovim
+:Lazy sync
+:TSUpdate
+:Mason
+```
+
+<Warning>
+  If you've made local modifications, you may need to resolve merge conflicts. Consider forking the repository and maintaining your own branch.
+</Warning>

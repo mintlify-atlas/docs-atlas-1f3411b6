@@ -1,0 +1,115 @@
+---
+title: 'Plugins Overview'
+description: 'A comprehensive collection of plugins that power nvim-luffy'
+---
+
+nvim-luffy comes with a carefully curated set of plugins that enhance your Neovim experience. Each plugin is configured with sensible defaults and optimal keybindings.
+
+## Plugin Categories
+
+<CardGroup cols={2}>
+  <Card title="Colorschemes" icon="palette" href="/plugins/colorschemes">
+    Multiple theme options including Catppuccin, Tokyo Night, Rose Pine, and more
+  </Card>
+  
+  <Card title="Telescope" icon="magnifying-glass" href="/plugins/telescope">
+    Fuzzy finder for files, text, and everything else
+  </Card>
+  
+  <Card title="Nvim-Tree" icon="folder-tree" href="/plugins/nvim-tree">
+    File explorer with git integration and custom keybindings
+  </Card>
+  
+  <Card title="Harpoon" icon="anchor" href="/plugins/harpoon">
+    Quick navigation between your most important files
+  </Card>
+  
+  <Card title="Alpha" icon="home" href="/plugins/alpha">
+    Beautiful dashboard with custom ASCII art
+  </Card>
+  
+  <Card title="LSP" icon="code" href="/plugins/lsp">
+    Language Server Protocol configuration with Mason
+  </Card>
+  
+  <Card title="Treesitter" icon="tree" href="/plugins/treesitter">
+    Advanced syntax highlighting and code understanding
+  </Card>
+  
+  <Card title="Completion" icon="sparkles" href="/plugins/completion">
+    Intelligent code completion with nvim-cmp
+  </Card>
+  
+  <Card title="Formatting" icon="wand-magic-sparkles" href="/plugins/formatting">
+    Code formatting with conform.nvim
+  </Card>
+  
+  <Card title="Git Integration" icon="git-alt" href="/plugins/git">
+    Neogit, Diffview, and more git tools
+  </Card>
+</CardGroup>
+
+## Core Dependencies
+
+The following plugins are core dependencies used by other plugins:
+
+- **plenary.nvim** - Lua functions library used by many plugins
+- **vim-tmux-navigator** - Seamless navigation between tmux panes and vim splits
+- **nvim-web-devicons** - File icons for file explorers and status lines
+
+## Plugin Management
+
+nvim-luffy uses [lazy.nvim](https://github.com/folke/lazy.nvim) as its plugin manager. Plugins are organized in the `lua/leyland/plugins/` directory, with each major plugin having its own configuration file.
+
+### Plugin Structure
+
+```
+lua/leyland/plugins/
+├── init.lua           # Core dependencies
+├── colorscheme.lua    # Theme configurations
+├── telescope.lua      # Fuzzy finder setup
+├── nvim-tree.lua      # File explorer
+├── harpoon.lua        # File navigation
+├── alpha.lua          # Dashboard
+├── lsp/              # LSP configurations
+│   ├── lsp.lua
+│   └── mason.lua
+└── ...
+```
+
+## Key Features
+
+### Lazy Loading
+
+Many plugins are configured to lazy load based on:
+- **Events** - Load when specific Neovim events occur
+- **Keys** - Load when specific keybindings are pressed
+- **Commands** - Load when specific commands are executed
+- **File types** - Load for specific file types
+
+This keeps startup time fast while ensuring all functionality is available when needed.
+
+### Consistent Keybindings
+
+All plugins follow a consistent keybinding scheme:
+- `<leader>` (Space) - Primary prefix for custom commands
+- `<leader>f` - File/Find operations (Telescope)
+- `<leader>e` - File explorer toggle
+- `<leader>h/H` - Harpoon operations
+- `<leader>g` - Git operations
+
+### Visual Consistency
+
+All UI plugins are configured to work well together:
+- Consistent icon usage via nvim-web-devicons
+- Theme-aware colors
+- Similar layout patterns
+
+## Next Steps
+
+Explore individual plugin documentation to learn about specific configurations and keybindings:
+
+- [Colorschemes](/plugins/colorschemes) - Choose and customize your theme
+- [Telescope](/plugins/telescope) - Master fuzzy finding
+- [Nvim-Tree](/plugins/nvim-tree) - Navigate your project structure
+- [Harpoon](/plugins/harpoon) - Speed up file navigation

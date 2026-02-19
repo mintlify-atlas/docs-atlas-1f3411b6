@@ -1,0 +1,196 @@
+---
+title: Keymaps
+description: Default keybindings and shortcuts
+---
+
+nvim-luffy configures essential keymaps for efficient editing. All keymaps are defined in `lua/leyland/core/keymaps.lua`.
+
+## Leader Key
+
+```lua
+vim.g.mapleader = " "
+```
+
+The leader key is set to **Space**. This key is used as a prefix for custom mappings.
+
+## Active Keymaps
+
+### Window Management
+
+| Key | Mode | Action | Description |
+|-----|------|--------|-------------|
+| `<leader>\|` | Normal | `<C-w>v` | Split window vertically |
+| `<leader>sh` | Normal | `<C-w>s` | Split window horizontally |
+
+<Accordion title="Window Splitting Examples">
+
+**Vertical Split:**
+- Press `Space` + `|` to create a vertical split
+- Opens a new window to the right (due to `splitright = true`)
+
+**Horizontal Split:**
+- Press `Space` + `sh` to create a horizontal split
+- Opens a new window below (due to `splitbelow = true`)
+
+**Native Vim window navigation still works:**
+- `<C-w>h` - Move to left window
+- `<C-w>j` - Move to bottom window
+- `<C-w>k` - Move to top window
+- `<C-w>l` - Move to right window
+- `<C-w>q` - Close current window
+
+</Accordion>
+
+### Buffer Management
+
+| Key | Mode | Action | Description |
+|-----|------|--------|-------------|
+| `<leader>bd` | Normal | `:bd<CR>` | Close current buffer |
+| `<leader>ba` | Normal | `:%bd<CR>` | Close all buffers |
+
+<Accordion title="Buffer Management Details">
+
+**Close Current Buffer:**
+- Press `Space` + `bd` to close the current buffer
+- Short for "buffer delete"
+- If the buffer has unsaved changes, Vim will warn you
+
+**Close All Buffers:**
+- Press `Space` + `ba` to close all open buffers
+- Short for "buffer all (delete)"
+- Use with caution - this closes all buffers at once
+- Buffers with unsaved changes will trigger warnings
+
+**Buffer Navigation:**
+These native Vim commands still work:
+- `:bn` or `:bnext` - Next buffer
+- `:bp` or `:bprevious` - Previous buffer
+- `:b <number>` - Go to buffer by number
+- `:ls` - List all buffers
+
+</Accordion>
+
+## Commented Out Keymaps
+
+The following keymaps are defined but commented out in the source. You can enable them by uncommenting in your configuration:
+
+<Accordion title="Insert Mode Escape">
+
+```lua
+-- Commented out by default
+-- keymap.set("i", "jk", "<ESC>", {desc = "Exit Insert mode with jk"})
+```
+
+**To enable:**
+
+```lua
+vim.keymap.set("i", "jk", "<ESC>", {desc = "Exit Insert mode with jk"})
+```
+
+This allows typing `jk` quickly in insert mode to return to normal mode, as an alternative to pressing `Esc`.
+
+</Accordion>
+
+<Accordion title="Clear Search Highlights">
+
+```lua
+-- Commented out by default
+-- keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+```
+
+**To enable:**
+
+```lua
+vim.keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+```
+
+This keymap is commented out because nvim-luffy has an autocommand that automatically clears search highlights when the cursor moves (see [autocommands](/core/autocommands#auto-clear-search-highlights)).
+
+</Accordion>
+
+## Adding Custom Keymaps
+
+You can add your own keymaps after nvim-luffy loads:
+
+```lua
+local keymap = vim.keymap
+
+-- Save file
+keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+
+-- Quit
+keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
+
+-- Move lines up/down in visual mode
+keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
+keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
+
+-- Better indenting
+keymap.set("v", "<", "<gv", { desc = "Indent left" })
+keymap.set("v", ">", ">gv", { desc = "Indent right" })
+
+-- Window navigation
+keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
+keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
+keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+
+-- Resize windows
+keymap.set("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height" })
+keymap.set("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
+keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
+keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
+```
+
+## Keymap Options
+
+When setting keymaps, you can use various options:
+
+```lua
+vim.keymap.set(mode, key, action, options)
+```
+
+**Common options:**
+
+| Option | Description |
+|--------|-------------|
+| `desc` | Description shown in which-key and other tools |
+| `silent` | Don't show command in command line (default: false) |
+| `noremap` | Don't allow recursive mapping (default: true) |
+| `buffer` | Set keymap only for specific buffer |
+| `expr` | Treat action as an expression to evaluate |
+| `nowait` | Don't wait for more characters (default: false) |
+
+**Example with options:**
+
+```lua
+vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", {
+  desc = "Save file",
+  silent = true,
+  noremap = true
+})
+```
+
+## Mode Shortcuts
+
+When setting keymaps, use these mode strings:
+
+| Mode | Description |
+|------|-------------|
+| `n` | Normal mode |
+| `i` | Insert mode |
+| `v` | Visual and Select mode |
+| `x` | Visual mode |
+| `s` | Select mode |
+| `o` | Operator-pending mode |
+| `c` | Command-line mode |
+| `t` | Terminal mode |
+| `""` | Normal, Visual, Select, Operator-pending |
+| `!` | Insert and Command-line mode |
+
+**Example setting keymap for multiple modes:**
+
+```lua
+-- Works in normal, visual, and operator-pending modes
+vim.keymap.set({"n", "v", "o"}, "<leader>y", '"+y', { desc = "Yank to system clipboard" })
+```

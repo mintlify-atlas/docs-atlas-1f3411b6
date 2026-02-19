@@ -1,0 +1,372 @@
+---
+title: 'Nvim-Tree'
+description: 'File explorer with git integration and custom keybindings'
+---
+
+Nvim-Tree is a file explorer for Neovim that provides a tree-like view of your project structure, with git integration and extensive customization options.
+
+## Features
+
+- Tree-style file browsing
+- Git status indicators
+- File operations (create, delete, rename, copy)
+- Custom keybindings for navigation
+- Positioned on the right side
+- Relative line numbers
+- Indent markers
+
+## Keymaps
+
+### Global Keymap
+
+| Keymap | Action | Description |
+|--------|--------|-------------|
+| `<leader>e` | Toggle Explorer | Open/close file explorer on current file |
+
+### Within Nvim-Tree
+
+These keymaps work when the Nvim-Tree window is focused:
+
+#### Custom Keymaps
+
+| Keymap | Action | Description |
+|--------|--------|-------------|
+| `l` | Open | Open file or expand directory |
+| `h` | Close Directory | Close directory or go to parent |
+
+#### Default Keymaps
+
+Nvim-Tree includes many default keymaps. Here are the most useful ones:
+
+| Keymap | Action |
+|--------|--------|
+| `<CR>` | Open file/expand directory |
+| `o` | Open file |
+| `<Tab>` | Preview file |
+| `a` | Create file/directory |
+| `d` | Delete file/directory |
+| `r` | Rename file/directory |
+| `x` | Cut file |
+| `c` | Copy file |
+| `p` | Paste file |
+| `y` | Copy filename |
+| `Y` | Copy relative path |
+| `gy` | Copy absolute path |
+| `R` | Refresh |
+| `?` | Show help |
+
+## Configuration
+
+The Nvim-Tree configuration is located at `lua/leyland/plugins/nvim-tree.lua`:
+
+```lua lua/leyland/plugins/nvim-tree.lua
+return {
+  "nvim-tree/nvim-tree.lua",
+  dependencies = "nvim-tree/nvim-web-devicons",
+  keys = {
+    { "<leader>e", "<cmd>NvimTreeFindFileToggle<cr>", desc = "Toggle file explorer" },
+  },
+  config = function()
+    local nvimtree = require("nvim-tree")
+    local api = require("nvim-tree.api")
+
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+
+    local function on_attach(bufnr)
+      local function opts(desc)
+        return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+      end
+
+      -- Default mappings
+      api.config.mappings.default_on_attach(bufnr)
+
+      -- Custom mappings
+      vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
+      vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+    end
+
+    nvimtree.setup({
+      on_attach = on_attach,
+      view = {
+        width = 50,
+        relativenumber = true,
+        side = "right",
+      },
+      renderer = {
+        indent_markers = {
+          enable = true,
+        },
+        icons = {
+          glyphs = {
+            folder = {
+              arrow_closed = "",
+              arrow_open = "",
+            },
+          },
+        },
+      },
+      actions = {
+        open_file = {
+          window_picker = {
+            enable = false,
+          },
+        },
+      },
+      filters = {
+        custom = { ".DS_Store" },
+      },
+      git = {
+        ignore = false,
+      },
+    })
+  end,
+}
+```
+
+## Configuration Details
+
+### View Settings
+
+```lua
+view = {
+  width = 50,
+  relativenumber = true,
+  side = "right",
+}
+```
+
+- **width**: Explorer width is set to 50 characters
+- **relativenumber**: Shows relative line numbers for quick jumping
+- **side**: Positioned on the right side of the screen (unusual but intentional)
+
+### Renderer Settings
+
+```lua
+renderer = {
+  indent_markers = {
+    enable = true,
+  },
+  icons = {
+    glyphs = {
+      folder = {
+        arrow_closed = "",
+        arrow_open = "",
+      },
+    },
+  },
+}
+```
+
+- **indent_markers**: Visual guides showing directory structure
+- **folder icons**: Custom arrow glyphs for collapsed/expanded folders
+
+### Git Integration
+
+```lua
+git = {
+  ignore = false,
+}
+```
+
+Files are shown even if they're in `.gitignore`. Git status indicators appear next to files:
+- `✓` - Staged
+- `✗` - Deleted
+- `★` - Renamed
+- `●` - Modified
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Navigation">
+    Opening and navigating the file explorer:
+    
+    ```
+    1. Press <leader>e (Space + e) to toggle the explorer
+    2. Use j/k or arrow keys to move up/down
+    3. Press l to open a file or expand a directory
+    4. Press h to close a directory or go to parent
+    5. Press <leader>e again to close the explorer
+    ```
+    
+    The explorer opens on the current file's location, making it easy to see context.
+  </Tab>
+  
+  <Tab title="File Operations">
+    Creating, renaming, and deleting files:
+    
+    **Create a file:**
+    ```
+    1. Navigate to the desired directory
+    2. Press a
+    3. Type the filename (add / at the end for directories)
+    4. Press Enter
+    ```
+    
+    **Rename a file:**
+    ```
+    1. Navigate to the file
+    2. Press r
+    3. Edit the filename
+    4. Press Enter
+    ```
+    
+    **Delete a file:**
+    ```
+    1. Navigate to the file
+    2. Press d
+    3. Confirm the deletion
+    ```
+  </Tab>
+  
+  <Tab title="Copy/Cut/Paste">
+    Moving and copying files:
+    
+    **Copy a file:**
+    ```
+    1. Navigate to the file
+    2. Press c (copy)
+    3. Navigate to destination directory
+    4. Press p (paste)
+    ```
+    
+    **Move a file:**
+    ```
+    1. Navigate to the file
+    2. Press x (cut)
+    3. Navigate to destination directory
+    4. Press p (paste)
+    ```
+  </Tab>
+  
+  <Tab title="Copy Paths">
+    Copying file paths to clipboard:
+    
+    ```
+    y   - Copy filename only
+    Y   - Copy relative path (from project root)
+    gy  - Copy absolute path (full system path)
+    ```
+    
+    **Example:**
+    - File: `/home/user/project/src/config.lua`
+    - `y`: `config.lua`
+    - `Y`: `src/config.lua`
+    - `gy`: `/home/user/project/src/config.lua`
+  </Tab>
+  
+  <Tab title="Git Status">
+    Viewing git changes in the explorer:
+    
+    Git status icons appear next to files:
+    ```
+    src/
+      config.lua   ●  (modified)
+      new-file.lua ✗  (untracked)
+    ```
+    
+    The explorer shows all files, including gitignored ones, but git status is still visible.
+  </Tab>
+</Tabs>
+
+## Customization
+
+### Changing Side
+
+To move the explorer to the left side:
+
+```lua
+view = {
+  side = "left",
+}
+```
+
+### Adjusting Width
+
+To change the explorer width:
+
+```lua
+view = {
+  width = 40,  -- or any other number
+}
+```
+
+### Custom Keymaps
+
+Add more custom keymaps in the `on_attach` function:
+
+```lua
+local function on_attach(bufnr)
+  local function opts(desc)
+    return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+  end
+
+  api.config.mappings.default_on_attach(bufnr)
+
+  -- Your custom mappings
+  vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
+  vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+  vim.keymap.set("n", "?", api.tree.toggle_help, opts("Help"))
+  vim.keymap.set("n", "v", api.node.open.vertical, opts("Open: Vertical Split"))
+end
+```
+
+### Filtering Files
+
+Add custom file filters:
+
+```lua
+filters = {
+  custom = { ".DS_Store", "node_modules", ".cache" },
+  dotfiles = false,  -- Set to true to hide dotfiles
+}
+```
+
+### Auto-close
+
+Auto-close explorer when it's the last window:
+
+```lua
+actions = {
+  open_file = {
+    quit_on_open = true,
+  },
+}
+```
+
+## Tips and Tricks
+
+1. **Quick navigation**: Use relative line numbers with `<number>j/k` to jump quickly
+2. **Preview files**: Use `<Tab>` to preview files without opening them
+3. **Refresh view**: Press `R` to refresh if files changed outside Neovim
+4. **Help menu**: Press `?` to see all available keymaps
+5. **Focus on current file**: `<leader>e` always opens on the current file's location
+
+## Disabling Netrw
+
+Nvim-Tree disables Neovim's built-in file explorer (netrw):
+
+```lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+```
+
+This prevents conflicts between the two file explorers.
+
+## Troubleshooting
+
+### Icons Not Showing
+
+- Ensure you have a Nerd Font installed and configured in your terminal
+- Check that `nvim-web-devicons` is installed
+
+### Git Status Not Showing
+
+- Ensure you're in a git repository
+- Check that git is installed: `git --version`
+- Try refreshing with `R`
+
+### Explorer Opens on Wrong Side
+
+- Check the `side` setting in your configuration
+- Default for nvim-luffy is `"right"`

@@ -1,0 +1,443 @@
+---
+title: 'Other Plugins'
+description: 'Additional plugins: Flash, Autopairs, Snacks, Trouble, and Todo-Comments'
+icon: 'puzzle-piece'
+---
+
+## Overview
+
+This page documents additional plugins that enhance the nvim-luffy experience, including motion enhancements, auto-pairing, UI improvements, diagnostics, and todo management.
+
+---
+
+## Flash
+
+### Overview
+
+Flash.nvim provides lightning-fast navigation using labels to jump to any location in the visible buffer.
+
+### Configuration
+
+From `lua/leyland/plugins/flash.lua:1`:
+
+```lua
+return {
+  "folke/flash.nvim",
+  event = "VeryLazy",
+  vscode = true,
+  opts = {
+    modes = {
+      char = {
+        char_actions = function(motion)
+          return {
+            [";"] = "next",
+            [","] = "prev",
+          }
+        end,
+      },
+    },
+  },
+  keys = {
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    { "<c-space>", mode = { "n", "o", "x" },
+      function()
+        require("flash").treesitter({
+          actions = {
+            ["<c-space>"] = "next",
+            ["<BS>"] = "prev"
+          }
+        }) 
+      end, desc = "Treesitter Incremental Selection" },
+  },
+}
+```
+
+### Keymaps
+
+| Key | Mode | Action | Description |
+|-----|------|--------|-------------|
+| `s` | n, x, o | Flash jump | Jump to any location with labels |
+| `S` | n, o, x | Flash Treesitter | Jump to treesitter nodes |
+| `r` | o | Remote Flash | Remote operation flash |
+| `R` | o, x | Treesitter Search | Search and select treesitter nodes |
+| `<C-s>` | c | Toggle Flash | Toggle flash in command mode |
+| `<C-Space>` | n, o, x | Incremental Selection | Select treesitter nodes incrementally |
+| `;` | n | Next match | Jump to next character match |
+| `,` | n | Previous match | Jump to previous character match |
+
+### Usage Examples
+
+**Basic Jump**
+
+Press `s` followed by characters you want to jump to. Flash will label all matching locations.
+
+**Treesitter Navigation**
+
+Press `S` to jump to treesitter nodes (functions, classes, etc.).
+
+**Incremental Selection**
+
+Press `<C-Space>` to select code based on treesitter nodes. Press again to expand selection.
+
+---
+
+## Autopairs
+
+### Overview
+
+nvim-autopairs automatically inserts matching pairs of brackets, quotes, and more. It integrates with nvim-cmp for smart pair completion.
+
+### Configuration
+
+From `lua/leyland/plugins/autopairs.lua:1`:
+
+```lua
+return {
+  "windwp/nvim-autopairs",
+  event = { "InsertEnter" },
+  dependencies = {
+    "hrsh7th/nvim-cmp",
+  },
+  config = function()
+    local autopairs = require("nvim-autopairs")
+
+    autopairs.setup({
+      check_ts = true, -- enable treesitter
+      ts_config = {
+        lua = { "string" }, -- don't add pairs in lua string treesitter nodes
+        javascript = { "template_string" }, -- don't add pairs in javascript template_string
+        java = false, -- don't check treesitter on java
+      },
+    })
+
+    -- integrate with nvim-cmp
+    local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+    local cmp = require("cmp")
+    cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+  end,
+}
+```
+
+### Features
+
+<CardGroup cols={2}>
+  <Card title="Auto Pairing" icon="brackets-curly">
+    Automatically close brackets, quotes, and tags
+  </Card>
+  <Card title="Treesitter Integration" icon="tree">
+    Smart pairing based on code context
+  </Card>
+  <Card title="CMP Integration" icon="sparkles">
+    Pairs work seamlessly with completions
+  </Card>
+  <Card title="Fast Wrap" icon="text-width">
+    Quickly wrap text in pairs
+  </Card>
+</CardGroup>
+
+### Behavior
+
+**Auto Close**
+
+Typing `(` automatically inserts `)`:
+```
+function test|
+```
+Type `(` →
+```
+function test(|)
+```
+
+**Treesitter-Aware**
+
+Doesn't auto-pair in strings (Lua) or template strings (JavaScript):
+```lua
+local str = "Don't auto-pair here|"
+```
+
+**CMP Integration**
+
+After selecting a function completion, automatically adds `()`:
+```
+print|  -- Complete with nvim-cmp
+print(|)  -- Automatically adds parentheses
+```
+
+---
+
+## Snacks
+
+### Overview
+
+Snacks.nvim provides smooth scrolling animations for a better visual experience.
+
+### Configuration
+
+From `lua/leyland/plugins/snacks.lua:1`:
+
+```lua
+return {
+  "folke/snacks.nvim",
+  priority = 1000,
+  lazy = false,
+  opts = {
+    scroll = {
+      enabled = true,
+      animate = {
+        duration = { step = 10, total = 100 },
+        easing = "linear",
+      },
+    },
+  },
+}
+```
+
+### Features
+
+- **Smooth Scrolling**: Animated scrolling with `<C-u>`, `<C-d>`, `<C-f>`, `<C-b>`
+- **Customizable Duration**: 100ms total animation time
+- **Linear Easing**: Consistent scroll speed
+
+### Customization
+
+Adjust scroll speed:
+
+```lua
+opts = {
+  scroll = {
+    enabled = true,
+    animate = {
+      duration = { step = 15, total = 200 },  -- Slower scrolling
+      easing = "linear",
+    },
+  },
+},
+```
+
+Disable smooth scrolling:
+
+```lua
+opts = {
+  scroll = {
+    enabled = false,
+  },
+},
+```
+
+---
+
+## Trouble
+
+### Overview
+
+Trouble.nvim provides a beautiful diagnostics list for LSP errors, warnings, and information messages.
+
+### Configuration
+
+From `lua/leyland/plugins/trouble.lua:1`:
+
+```lua
+return {
+  "folke/trouble.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  opts = {},
+  keys = {
+    { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Toggle Trouble" },
+  },
+}
+```
+
+### Keymaps
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<leader>xx` | Toggle Trouble | Open/close diagnostics list |
+
+### Inside Trouble Window
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<CR>` | Jump | Jump to diagnostic location |
+| `q` | Close | Close Trouble window |
+| `<Tab>` | Next | Jump to next diagnostic |
+| `<S-Tab>` | Previous | Jump to previous diagnostic |
+| `?` | Help | Show keybindings |
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `:Trouble diagnostics toggle` | Toggle diagnostics list |
+| `:Trouble diagnostics open` | Open diagnostics list |
+| `:Trouble diagnostics close` | Close diagnostics list |
+| `:Trouble symbols toggle` | Toggle document symbols |
+| `:Trouble lsp toggle` | Toggle LSP definitions/references |
+| `:Trouble quickfix toggle` | Toggle quickfix list |
+
+### Usage Example
+
+1. Press `<leader>xx` to open diagnostics
+2. Navigate with `j`/`k` or `<Tab>`/`<S-Tab>`
+3. Press `<CR>` to jump to error location
+4. Press `q` to close
+
+---
+
+## Todo-Comments
+
+### Overview
+
+Todo-comments highlights and searches TODO, HACK, BUG, and other comment annotations. Integrated with Telescope for easy searching.
+
+### Configuration
+
+Todo-comments is loaded as a dependency of Telescope:
+
+From `lua/leyland/plugins/telescope.lua:8`:
+
+```lua
+dependencies = {
+  "nvim-lua/plenary.nvim",
+  { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+  "nvim-tree/nvim-web-devicons",
+  "folke/todo-comments.nvim",
+},
+```
+
+### Keymaps
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `<leader>ft` | Find todos | Search all TODO comments with Telescope |
+
+From `lua/leyland/plugins/telescope.lua:42`:
+
+```lua
+keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
+```
+
+### Highlighted Keywords
+
+The following keywords are automatically highlighted:
+
+- **TODO**: Tasks to be done
+- **HACK**: Temporary workarounds
+- **WARN**: Warnings
+- **PERF**: Performance issues
+- **NOTE**: Notes and explanations
+- **FIX**: Bugs to fix
+- **BUG**: Known bugs
+
+### Usage Examples
+
+**In Code**
+
+```lua
+-- TODO: Implement error handling
+function fetchData()
+  -- HACK: Temporary fix for API change
+  return api.call()
+end
+
+-- PERF: This loop could be optimized
+for i = 1, 1000 do
+  process(i)
+end
+```
+
+**Search Todos**
+
+Press `<leader>ft` to open Telescope and search all TODO comments across your project.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `:TodoTelescope` | Search todos with Telescope |
+| `:TodoQuickFix` | Add todos to quickfix list |
+| `:TodoLocList` | Add todos to location list |
+
+### Customization
+
+To customize todo-comments, create an explicit configuration:
+
+```lua
+return {
+  "folke/todo-comments.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  opts = {
+    keywords = {
+      FIX = { icon = " ", color = "error" },
+      TODO = { icon = " ", color = "info" },
+      HACK = { icon = " ", color = "warning" },
+      WARN = { icon = " ", color = "warning" },
+      PERF = { icon = " ", color = "default" },
+      NOTE = { icon = " ", color = "hint" },
+    },
+  },
+}
+```
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I disable Flash?">
+    Remove or comment out the Flash plugin in `lua/leyland/plugins/flash.lua`, or disable specific keymaps:
+
+    ```lua
+    keys = {
+      -- Comment out the mappings you don't want
+      -- { "s", ... },
+    },
+    ```
+  </Accordion>
+
+  <Accordion title="Can I add custom autopair rules?">
+    Yes, add custom rules in the autopairs config:
+
+    ```lua
+    local Rule = require("nvim-autopairs.rule")
+    autopairs.add_rules({
+      Rule("<", ">", "rust"),  -- Auto-close angle brackets in Rust
+    })
+    ```
+  </Accordion>
+
+  <Accordion title="How do I customize Trouble's appearance?">
+    Configure Trouble options:
+
+    ```lua
+    opts = {
+      position = "bottom",
+      height = 15,
+      icons = true,
+      mode = "workspace_diagnostics",
+    },
+    ```
+  </Accordion>
+
+  <Accordion title="Can I add custom TODO keywords?">
+    Yes, configure todo-comments explicitly and add custom keywords (see Customization section above).
+  </Accordion>
+
+  <Accordion title="Why is smooth scrolling laggy?">
+    Reduce the animation duration in Snacks configuration:
+
+    ```lua
+    duration = { step = 5, total = 50 },  -- Faster animation
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [Treesitter](/plugins/treesitter) - Flash treesitter integration
+- [Completion](/plugins/completion) - Autopairs CMP integration
+- [LSP Configuration](/plugins/lsp) - Trouble diagnostics source
+- [Telescope](/plugins/telescope) - Todo-comments search integration

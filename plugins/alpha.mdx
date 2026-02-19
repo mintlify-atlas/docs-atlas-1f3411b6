@@ -1,0 +1,335 @@
+---
+title: 'Alpha Dashboard'
+description: 'Beautiful startup dashboard with custom ASCII art'
+---
+
+Alpha is a fast and customizable startup screen for Neovim. nvim-luffy includes a custom One Piece-themed ASCII art dashboard that greets you when you start Neovim.
+
+## Features
+
+- Custom Luffy ASCII art header
+- Quick action buttons for common tasks
+- Inspirational One Piece quote
+- Loads on Neovim startup
+- No folding interference
+
+## Dashboard Preview
+
+When you start Neovim without opening a file, you'll see:
+
+```
+[Luffy ASCII Art - A detailed character portrait]
+
+"Maybe the One Piece was the commits you made along the way."
+
+  Find file
+  Recent files
+  Quit
+```
+
+## Configuration
+
+The Alpha dashboard configuration is located at `lua/leyland/plugins/alpha.lua`:
+
+```lua lua/leyland/plugins/alpha.lua
+return {
+  "goolord/alpha-nvim",
+  event = "VimEnter",
+  config = function()
+    local alpha = require("alpha")
+    local dashboard = require("alpha.themes.dashboard")
+
+    dashboard.section.header.val = {
+      -- ASCII art lines (Luffy character)
+      -- [42 lines of ASCII art]
+    }
+
+    -- Set menu buttons
+    dashboard.section.buttons.val = {
+      dashboard.button("f", "  Find file", ":Telescope find_files <CR>"),
+      dashboard.button("r", "  Recent files", ":Telescope oldfiles <CR>"),
+      dashboard.button("q", "  Quit", ":qa<CR>"),
+    }
+
+    dashboard.section.footer.val = {
+      "",
+      '"Maybe the One Piece was the commits you made along the way."',
+      "",
+    }
+
+    dashboard.config.layout = {
+      { type = "padding", val = 2 },
+      dashboard.section.header,
+      { type = "padding", val = 2 },
+      dashboard.section.footer,
+      { type = "padding", val = 2 },
+      dashboard.section.buttons,
+      { type = "padding", val = 1 },
+    }
+
+    dashboard.section.footer.opts.hl = "Comment"
+    alpha.setup(dashboard.opts)
+
+    -- Disable folding on alpha buffer
+    vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
+  end,
+}
+```
+
+## Dashboard Buttons
+
+The dashboard includes three quick action buttons:
+
+| Key | Action | Command |
+|-----|--------|--------|
+| `f` | Find file | Opens Telescope file finder |
+| `r` | Recent files | Opens Telescope recent files |
+| `q` | Quit | Exits Neovim |
+
+Simply press the key to trigger the action.
+
+## Layout Structure
+
+The dashboard layout from top to bottom:
+
+1. **Padding** (2 lines)
+2. **Header** - Luffy ASCII art
+3. **Padding** (2 lines)
+4. **Footer** - One Piece quote in comment color
+5. **Padding** (2 lines)
+6. **Buttons** - Quick action menu
+7. **Padding** (1 line)
+
+## Customization
+
+<Tabs>
+  <Tab title="Custom ASCII Art">
+    Replace the header with your own ASCII art:
+    
+    ```lua
+    dashboard.section.header.val = {
+      "███╗   ██╗██╗   ██╗██╗███╗   ███╗",
+      "████╗  ██║██║   ██║██║████╗ ████║",
+      "██╔██╗ ██║██║   ██║██║██╔████╔██║",
+      "██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║",
+      "██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║",
+      "╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝",
+    }
+    ```
+    
+    Tips:
+    - Each line must be a separate string in the array
+    - Use tools like [ASCII Art Generator](https://patorjk.com/software/taag/)
+    - Keep width reasonable (under 80 characters for compatibility)
+  </Tab>
+  
+  <Tab title="Custom Buttons">
+    Add or modify dashboard buttons:
+    
+    ```lua
+    dashboard.section.buttons.val = {
+      dashboard.button("f", "  Find file", ":Telescope find_files <CR>"),
+      dashboard.button("r", "  Recent files", ":Telescope oldfiles <CR>"),
+      dashboard.button("n", "  New file", ":ene <BAR> startinsert <CR>"),
+      dashboard.button("c", "  Config", ":e ~/.config/nvim/init.lua <CR>"),
+      dashboard.button("u", "  Update plugins", ":Lazy sync<CR>"),
+      dashboard.button("q", "  Quit", ":qa<CR>"),
+    }
+    ```
+    
+    Button format: `dashboard.button(key, label, command)`
+  </Tab>
+  
+  <Tab title="Custom Quote">
+    Change the footer quote:
+    
+    ```lua
+    dashboard.section.footer.val = {
+      "",
+      '"Your custom quote here"',
+      "",
+    }
+    ```
+    
+    Or make it dynamic:
+    ```lua
+    local quotes = {
+      '"Code is poetry"',
+      '"Keep calm and code on"',
+      '"Debugging is twice as hard as writing code"',
+    }
+    dashboard.section.footer.val = {
+      "",
+      quotes[math.random(#quotes)],
+      "",
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Adjust Layout">
+    Modify spacing between sections:
+    
+    ```lua
+    dashboard.config.layout = {
+      { type = "padding", val = 5 },  -- More space at top
+      dashboard.section.header,
+      { type = "padding", val = 1 },  -- Less space after header
+      dashboard.section.footer,
+      { type = "padding", val = 3 },  -- More space before buttons
+      dashboard.section.buttons,
+      { type = "padding", val = 2 },
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Color Customization">
+    Customize colors using highlight groups:
+    
+    ```lua
+    -- Footer in comment color (default)
+    dashboard.section.footer.opts.hl = "Comment"
+    
+    -- Header in custom color
+    dashboard.section.header.opts.hl = "Title"
+    
+    -- Define custom highlight group
+    vim.cmd([[
+      highlight AlphaHeader guifg=#7aa2f7
+      highlight AlphaFooter guifg=#9ece6a
+    ]])
+    
+    dashboard.section.header.opts.hl = "AlphaHeader"
+    dashboard.section.footer.opts.hl = "AlphaFooter"
+    ```
+  </Tab>
+</Tabs>
+
+## The ASCII Art
+
+The default ASCII art is a detailed portrait of Luffy from One Piece, created using Braille characters for smooth curves and details. The art is 42 lines tall and carefully crafted to look good in any terminal.
+
+## Advanced Features
+
+### Dynamic Content
+
+Make the dashboard show dynamic information:
+
+```lua
+-- Show current date/time
+local datetime = os.date("%Y-%m-%d %H:%M")
+dashboard.section.footer.val = {
+  "",
+  '"Maybe the One Piece was the commits you made along the way."',
+  "",
+  datetime,
+}
+
+-- Show git branch
+local branch = vim.fn.system("git branch --show-current 2>/dev/null | tr -d '\n'")
+if branch ~= "" then
+  table.insert(dashboard.section.footer.val, "Branch: " .. branch)
+end
+```
+
+### Session Management
+
+Add session restore button:
+
+```lua
+dashboard.button("s", "  Restore session", ":lua require('persistence').load()<CR>")
+```
+
+### Plugin Statistics
+
+Show plugin count:
+
+```lua
+local lazy_stats = require("lazy").stats()
+local plugins_text = "  " .. lazy_stats.count .. " plugins"
+
+table.insert(dashboard.section.footer.val, plugins_text)
+```
+
+## Disabling the Dashboard
+
+If you prefer not to see the dashboard:
+
+### Option 1: Disable the Plugin
+
+Comment out or remove the alpha plugin in your config:
+
+```lua
+-- return {
+--   "goolord/alpha-nvim",
+--   ...
+-- }
+```
+
+### Option 2: Skip Dashboard
+
+Always open Neovim with a file:
+
+```bash
+nvim .          # Open current directory
+nvim file.lua   # Open specific file
+```
+
+## Autocmd Details
+
+```lua
+vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
+```
+
+This prevents folding from being enabled on the dashboard, ensuring the ASCII art displays correctly.
+
+## Tips and Tricks
+
+1. **Quick start**: Press `f` immediately after opening to find files
+2. **Muscle memory**: The button keys (`f`, `r`, `q`) match common commands
+3. **No file open**: The dashboard only shows when no file is open
+4. **Theme aware**: The dashboard respects your colorscheme
+5. **Fast loading**: Loads on `VimEnter` event, doesn't slow down startup
+
+## Alternative Themes
+
+Alpha includes other built-in themes you can use:
+
+### Startify Theme
+
+```lua
+local startify = require("alpha.themes.startify")
+alpha.setup(startify.config)
+```
+
+### Theta Theme
+
+```lua
+local theta = require("alpha.themes.theta")
+alpha.setup(theta.config)
+```
+
+## Troubleshooting
+
+### ASCII Art Looks Broken
+
+- Ensure your terminal supports UTF-8 and Braille characters
+- Try a different terminal or font
+- Reduce terminal font size if art is too large
+
+### Dashboard Not Showing
+
+- Check if you're opening Neovim with a file: `nvim file.lua`
+- Ensure the plugin is installed: `:Lazy`
+- Check for errors: `:messages`
+
+### Buttons Not Working
+
+- Ensure dependencies (Telescope) are installed
+- Check for errors in the command strings
+- Try pressing the key in normal mode
+
+### Wrong Colors
+
+- Check your colorscheme supports the highlight groups
+- Try setting custom highlight groups (see Color Customization tab)
+- Some themes may not define `Comment` highlight

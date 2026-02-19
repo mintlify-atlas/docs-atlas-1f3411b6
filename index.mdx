@@ -1,97 +1,179 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: 'Welcome to nvim-luffy'
+description: 'A powerful Neovim configuration inspired by the spirit of adventure'
 ---
 
-## Setting upasdfasdf
-asdfasdf
-Get your documentation site up and running in minutes.
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="nvim-luffy Hero"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="nvim-luffy Hero"
+/>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+## Set Sail on Your Coding Journey
 
-## Make it yours
+nvim-luffy is a meticulously crafted Neovim configuration that transforms your editor into a powerful development environment. Like the legendary pirate seeking the One Piece, this configuration helps you navigate the vast seas of code with speed, precision, and style.
 
-Design a docs site that looks great and empowers your users.
+<Note>
+  "Maybe the One Piece was the commits you made along the way."
+</Note>
 
-<Columns cols={2}>
+## What is nvim-luffy?
+
+nvim-luffy is a complete Neovim configuration built with modern Lua practices and powered by [lazy.nvim](https://github.com/folke/lazy.nvim) for blazing-fast plugin management. It provides a carefully curated set of plugins and keybindings designed for productive development across multiple languages.
+
+<CardGroup cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+    title="Modern Plugin System"
+    icon="plug"
+    href="/plugins/overview"
   >
-    Edit your docs locally and preview them in real time.
+    Powered by lazy.nvim with automatic plugin management and lazy-loading for optimal startup time
   </Card>
   <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
+    title="Complete LSP Setup"
     icon="code"
-    href="/essentials/code"
+    href="/plugins/lsp"
   >
-    Add sample code to demonstrate how to use your product.
+    Full LSP support with Mason for easy language server installation, autocompletion, and diagnostics
   </Card>
   <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
+    title="Fuzzy Finding"
+    icon="magnifying-glass"
+    href="/plugins/telescope"
   >
-    Display images and other media.
+    Telescope integration for fast file finding, live grep, and project navigation
   </Card>
   <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
+    title="Smart Navigation"
+    icon="compass"
+    href="/plugins/harpoon"
   >
-    Write once and reuse across your docs.
+    Harpoon integration for lightning-fast file switching between your most important files
   </Card>
-</Columns>
+  <Card
+    title="Beautiful Themes"
+    icon="palette"
+    href="/plugins/colorschemes"
+  >
+    Multiple colorschemes included: Catppuccin, Tokyo Night, Bamboo, Rose Pine, and more
+  </Card>
+  <Card
+    title="Git Integration"
+    icon="code-branch"
+    href="/plugins/git"
+  >
+    Neogit and Diffview for seamless Git workflows directly in Neovim
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+## Key Features
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+### Lightning-Fast Startup
+Optimized plugin loading with lazy.nvim ensures your editor is ready when you are. Most plugins load on-demand, keeping startup times minimal.
+
+### Full-Featured LSP
+Out-of-the-box support for:
+- TypeScript/JavaScript (ts_ls)
+- HTML, CSS, Tailwind
+- Lua (lua_ls)
+- Python (pyright)
+- GraphQL, Svelte, Prisma
+- And more via Mason
+
+### Intelligent Completion
+Powered by nvim-cmp with:
+- LSP-based completions
+- Snippet support via LuaSnip
+- Path and buffer completions
+- VS Code-like pictograms
+
+### Smart Code Navigation
+- **Telescope**: Fuzzy find files, grep through projects, search recent files
+- **Harpoon**: Mark and instantly jump to your most important files
+- **Treesitter**: Advanced syntax highlighting and code understanding
+- **Flash**: Jump to any location with minimal keystrokes
+
+### Developer Experience
+- **Formatting**: Automatic code formatting with Prettier, Stylua, Black
+- **File Explorer**: nvim-tree with intuitive keybindings
+- **Autopairs**: Intelligent bracket and quote pairing
+- **Trouble**: Beautiful diagnostics and quickfix lists
+- **Alpha**: Custom dashboard with One Piece-themed ASCII art
+
+## Philosophy
+
+nvim-luffy follows these core principles:
+
+1. **Minimal but Complete**: Only include plugins that add real value
+2. **Speed First**: Lazy-load everything possible
+3. **Sane Defaults**: Works great out of the box, customizable when needed
+4. **Modern Lua**: Built entirely in Lua with clean, maintainable code
+5. **Keyboard-Driven**: Efficient keybindings with Space as leader key
+
+## Project Structure
+
+```lua
+~/.config/nvim/
+├── init.lua                    # Entry point
+└── lua/
+    └── leyland/
+        ├── core/
+        │   ├── init.lua        # Loads core modules
+        │   ├── options.lua     # Vim options
+        │   ├── keymaps.lua     # Global keybindings
+        │   └── autocommands.lua # Autocommands
+        ├── lazy.lua            # Lazy.nvim bootstrap
+        ├── lsp.lua             # LSP configuration
+        └── plugins/            # Plugin specifications
+            ├── init.lua
+            ├── alpha.lua       # Dashboard
+            ├── telescope.lua   # Fuzzy finder
+            ├── nvim-cmp.lua    # Completion
+            ├── harpoon.lua     # File navigation
+            ├── treesitter.lua  # Syntax highlighting
+            └── lsp/
+                ├── mason.lua   # LSP installer
+                └── lsp.lua     # LSP setup
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Installation"
+    icon="download"
+    href="/installation"
+  >
+    Get nvim-luffy up and running in minutes
+  </Card>
+  <Card
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Learn the essential keybindings and workflows
+  </Card>
+  <Card
+    title="Configuration"
+    icon="gear"
+    href="/guides/configuration"
+  >
+    Customize nvim-luffy to match your preferences
+  </Card>
+  <Card
+    title="Plugins Reference"
+    icon="book"
+    href="/reference/plugins"
+  >
+    Deep dive into each plugin and its configuration
+  </Card>
+</CardGroup>
+
+<Tip>
+  New to Neovim? Check out our [Beginner's Guide](/guides/beginners) to learn the basics!
+</Tip>

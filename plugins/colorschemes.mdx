@@ -1,0 +1,203 @@
+---
+title: 'Colorschemes'
+description: 'Theme options and configuration for nvim-luffy'
+---
+
+nvim-luffy includes multiple high-quality colorschemes, allowing you to choose the one that best suits your preferences.
+
+## Available Themes
+
+All themes are pre-installed and ready to use. Simply change the `vim.cmd.colorscheme()` call in the configuration.
+
+<Tabs>
+  <Tab title="Bamboo (Default)">
+    The default theme for nvim-luffy. A warm, nature-inspired color scheme.
+    
+    ```lua
+    vim.cmd.colorscheme("bamboo")
+    ```
+    
+    **Plugin**: [ribru17/bamboo.nvim](https://github.com/ribru17/bamboo.nvim)
+  </Tab>
+  
+  <Tab title="Catppuccin">
+    A soothing pastel theme with multiple flavors.
+    
+    ```lua
+    vim.cmd.colorscheme("catppuccin")
+    ```
+    
+    Available variants: `catppuccin-latte`, `catppuccin-frappe`, `catppuccin-macchiato`, `catppuccin-mocha`
+    
+    **Plugin**: [catppuccin/nvim](https://github.com/catppuccin/nvim)
+  </Tab>
+  
+  <Tab title="Tokyo Night">
+    A clean, dark theme inspired by Tokyo at night.
+    
+    ```lua
+    vim.cmd.colorscheme("tokyonight")
+    ```
+    
+    Available variants: `tokyonight-night`, `tokyonight-storm`, `tokyonight-day`, `tokyonight-moon`
+    
+    **Plugin**: [folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim)
+  </Tab>
+  
+  <Tab title="Rose Pine">
+    An elegant, low-contrast theme.
+    
+    ```lua
+    vim.cmd.colorscheme("rose-pine")
+    ```
+    
+    Available variants: `rose-pine`, `rose-pine-moon`, `rose-pine-dawn`
+    
+    **Plugin**: [rose-pine/neovim](https://github.com/rose-pine/neovim)
+  </Tab>
+  
+  <Tab title="Modus Themes">
+    Accessible themes that conform to the highest accessibility standards.
+    
+    ```lua
+    vim.cmd.colorscheme("modus")
+    ```
+    
+    Available variants: `modus_operandi`, `modus_vivendi`
+    
+    **Plugin**: [miikanissi/modus-themes.nvim](https://github.com/miikanissi/modus-themes.nvim)
+  </Tab>
+  
+  <Tab title="OneDark">
+    A theme inspired by Atom's One Dark.
+    
+    ```lua
+    vim.cmd.colorscheme("onedark")
+    ```
+    
+    **Plugin**: [navarasu/onedark.nvim](https://github.com/navarasu/onedark.nvim)
+  </Tab>
+</Tabs>
+
+## Configuration
+
+The colorscheme configuration is located at `lua/leyland/plugins/colorscheme.lua`:
+
+```lua lua/leyland/plugins/colorscheme.lua
+return {
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+  },
+  {
+    "folke/tokyonight.nvim",
+    priority = 1000,
+  },
+  {
+    "miikanissi/modus-themes.nvim",
+    priority = 1000,
+  },
+  {
+    "ribru17/bamboo.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    "navarasu/onedark.nvim",
+    priority = 1000,
+  },
+  {
+    "rose-pine/neovim",
+    name = "rose-pine",
+    priority = 1000,
+    config = function()
+      -- Set your default theme here
+      vim.cmd.colorscheme("bamboo")
+    end,
+  },
+}
+```
+
+## Changing the Default Theme
+
+To change the default colorscheme:
+
+1. Open `lua/leyland/plugins/colorscheme.lua`
+2. Find the `config = function()` section in the rose-pine plugin configuration (line 35)
+3. Change `"bamboo"` to your preferred theme:
+
+```lua
+config = function()
+  -- Set your default theme here
+  vim.cmd.colorscheme("tokyonight")
+end,
+```
+
+## Theme Priority
+
+All colorscheme plugins have `priority = 1000`, ensuring they load before other plugins. The `lazy = false` setting on bamboo ensures it's always available immediately.
+
+## Runtime Theme Switching
+
+You can switch themes at runtime using the `:colorscheme` command:
+
+```vim
+:colorscheme catppuccin-mocha
+:colorscheme tokyonight-night
+:colorscheme rose-pine-moon
+```
+
+## Advanced Configuration
+
+Some themes support additional configuration. For example, OneDark includes commented-out configuration:
+
+```lua
+require("onedark").setup({
+  style = "deep",
+})
+require("onedark").load()
+```
+
+To customize a theme:
+
+1. Uncomment or add the theme's setup function
+2. Configure options according to the theme's documentation
+3. Call the theme's load function if required
+
+## Transparent Backgrounds
+
+Most themes support transparent backgrounds. Configure this in each theme's setup:
+
+```lua
+require("catppuccin").setup({
+  transparent_background = true,
+})
+```
+
+## Theme Integration
+
+All themes integrate seamlessly with:
+- Telescope fuzzy finder
+- Nvim-Tree file explorer
+- LSP diagnostic colors
+- Treesitter syntax highlighting
+- Status line components
+- Alpha dashboard
+
+## Troubleshooting
+
+### Colors Not Showing Correctly
+
+1. Ensure your terminal supports 24-bit color (true color)
+2. Add to your shell configuration:
+   ```bash
+   export TERM=xterm-256color
+   ```
+3. Check Neovim's termguicolors setting (should be enabled by default in nvim-luffy)
+
+### Theme Not Loading
+
+1. Ensure the plugin is installed: `:Lazy`
+2. Check for errors: `:messages`
+3. Try manually loading: `:colorscheme bamboo`

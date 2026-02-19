@@ -1,0 +1,181 @@
+---
+title: Plugin Dependencies
+description: Complete list of plugins used in nvim-luffy with their purposes
+---
+
+## Overview
+
+nvim-luffy uses 42 plugins managed by lazy.nvim. All plugin versions are locked in `lazy-lock.json` to ensure consistent behavior across installations.
+
+## Plugin Categories
+
+### Core Dependencies
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **lazy.nvim** | Plugin manager | [folke/lazy.nvim](https://github.com/folke/lazy.nvim) |
+| **plenary.nvim** | Lua utility functions used by many plugins | [nvim-lua/plenary.nvim](https://github.com/nvim-lua/plenary.nvim) |
+
+### Language Server Protocol (LSP)
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **nvim-lspconfig** | Collection of LSP configurations | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) |
+| **mason.nvim** | LSP/DAP/linter/formatter installer | [williamboman/mason.nvim](https://github.com/williamboman/mason.nvim) |
+| **mason-lspconfig.nvim** | Bridge between mason and lspconfig | [williamboman/mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim) |
+| **mason-tool-installer.nvim** | Automatic tool installation for mason | [WhoIsSethDaniel/mason-tool-installer.nvim](https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim) |
+| **lazydev.nvim** | Better Lua development for Neovim config | [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim) |
+| **nvim-lsp-file-operations** | LSP file operations (rename, move) | [antosha417/nvim-lsp-file-operations](https://github.com/antosha417/nvim-lsp-file-operations) |
+
+### Completion & Snippets
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **nvim-cmp** | Completion engine | [hrsh7th/nvim-cmp](https://github.com/hrsh7th/nvim-cmp) |
+| **cmp-nvim-lsp** | LSP completion source for nvim-cmp | [hrsh7th/cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp) |
+| **cmp-buffer** | Buffer words completion source | [hrsh7th/cmp-buffer](https://github.com/hrsh7th/cmp-buffer) |
+| **cmp-path** | File path completion source | [hrsh7th/cmp-path](https://github.com/hrsh7th/cmp-path) |
+| **cmp_luasnip** | LuaSnip completion source | [saadparwaiz1/cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip) |
+| **LuaSnip** | Snippet engine | [L3MON4D3/LuaSnip](https://github.com/L3MON4D3/LuaSnip) |
+| **friendly-snippets** | Collection of snippets for various languages | [rafamadriz/friendly-snippets](https://github.com/rafamadriz/friendly-snippets) |
+| **lspkind.nvim** | VSCode-like pictograms for completion items | [onsails/lspkind.nvim](https://github.com/onsails/lspkind.nvim) |
+
+### Fuzzy Finder & Navigation
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **telescope.nvim** | Extensible fuzzy finder | [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) |
+| **telescope-fzf-native.nvim** | FZF sorter for telescope (C extension) | [nvim-telescope/telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim) |
+| **fzf-lua** | Lua-based FZF interface | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua) |
+| **mini.pick** | Minimal picker (from mini.nvim suite) | [echasnovski/mini.pick](https://github.com/echasnovski/mini.nvim) |
+| **harpoon** | Quick file navigation with marks | [ThePrimeagen/harpoon](https://github.com/ThePrimeagen/harpoon) |
+| **flash.nvim** | Navigate code with search labels | [folke/flash.nvim](https://github.com/folke/flash.nvim) |
+
+### File Explorer
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **nvim-tree.lua** | File explorer sidebar | [nvim-tree/nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua) |
+| **nvim-web-devicons** | File type icons | [nvim-tree/nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) |
+
+### Syntax & Parsing
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **nvim-treesitter** | Syntax parsing and highlighting | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) |
+
+### Git Integration
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **neogit** | Git client interface | [NeogitOrg/neogit](https://github.com/NeogitOrg/neogit) |
+| **diffview.nvim** | Git diff viewer | [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim) |
+
+### Code Quality
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **conform.nvim** | Code formatter | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim) |
+| **trouble.nvim** | Pretty diagnostics list | [folke/trouble.nvim](https://github.com/folke/trouble.nvim) |
+| **todo-comments.nvim** | Highlight and search TODO comments | [folke/todo-comments.nvim](https://github.com/folke/todo-comments.nvim) |
+
+### Editing Enhancement
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **nvim-autopairs** | Auto-close brackets and quotes | [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs) |
+
+### UI & Visual
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **alpha-nvim** | Startup dashboard | [goolord/alpha-nvim](https://github.com/goolord/alpha-nvim) |
+| **snacks.nvim** | Collection of UI components and utilities | [folke/snacks.nvim](https://github.com/folke/snacks.nvim) |
+
+### Colorschemes
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **catppuccin** | Catppuccin theme | [catppuccin/nvim](https://github.com/catppuccin/nvim) |
+| **tokyonight.nvim** | Tokyo Night theme | [folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim) |
+| **rose-pine** | Rosé Pine theme | [rose-pine/neovim](https://github.com/rose-pine/neovim) |
+| **onedark.nvim** | OneDark theme | [navarasu/onedark.nvim](https://github.com/navarasu/onedark.nvim) |
+| **bamboo.nvim** | Bamboo theme | [ribru17/bamboo.nvim](https://github.com/ribru17/bamboo.nvim) |
+| **modus-themes.nvim** | Modus themes (Emacs port) | [miikanissi/modus-themes.nvim](https://github.com/miikanissi/modus-themes.nvim) |
+
+### Integration
+
+| Plugin | Purpose | Repository |
+|--------|---------|------------|
+| **vim-tmux-navigator** | Seamless tmux and vim split navigation | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) |
+
+## Locked Versions
+
+All plugins are locked to specific commits in `lazy-lock.json`. This ensures:
+
+- **Reproducibility**: Same versions across all installations
+- **Stability**: Prevents breaking changes from automatic updates
+- **Control**: Updates only when explicitly run with `:Lazy update`
+
+### Updating Plugins
+
+To update all plugins:
+
+```vim
+:Lazy update
+```
+
+To update a specific plugin:
+
+```vim
+:Lazy update plugin-name
+```
+
+After updating, test thoroughly before committing the updated `lazy-lock.json`.
+
+## Plugin Loading Strategy
+
+Plugins are loaded using various strategies for optimal startup time:
+
+- **Lazy-loaded on event**: Load when specific Neovim events occur
+- **Lazy-loaded on keymap**: Load when specific keys are pressed
+- **Lazy-loaded on command**: Load when a command is run
+- **Lazy-loaded on filetype**: Load for specific file types
+- **Eager-loaded**: Load immediately at startup (only for essential plugins)
+
+## Adding New Plugins
+
+To add a new plugin:
+
+1. Create a new file in `lua/leyland/plugins/` or add to an existing file
+2. Return a table with the plugin specification:
+   ```lua
+   return {
+     "author/plugin-name",
+     config = function()
+       -- Setup code
+     end,
+   }
+   ```
+3. Restart Neovim - lazy.nvim will auto-install the plugin
+4. The plugin will be added to `lazy-lock.json` automatically
+
+## Removing Plugins
+
+To remove a plugin:
+
+1. Delete or comment out the plugin specification
+2. Run `:Lazy clean` to remove the plugin files
+3. Restart Neovim
+
+## Dependencies Graph
+
+Some plugins depend on others:
+
+- **Telescope** → plenary.nvim, telescope-fzf-native.nvim, nvim-web-devicons
+- **Completion** → nvim-cmp + multiple cmp sources + LuaSnip + friendly-snippets + lspkind
+- **LSP** → nvim-lspconfig + mason.nvim + mason-lspconfig + mason-tool-installer
+- **File Explorer** → nvim-tree.lua + nvim-web-devicons + nvim-lsp-file-operations
+- **Git** → neogit + diffview.nvim (both depend on plenary.nvim)
+
+Dependencies are handled automatically by lazy.nvim when specified in plugin configs.

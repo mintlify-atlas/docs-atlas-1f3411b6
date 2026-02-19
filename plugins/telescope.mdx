@@ -1,0 +1,272 @@
+---
+title: 'Telescope'
+description: 'Fuzzy finder for files, text, and everything else'
+---
+
+Telescope is a highly extensible fuzzy finder over lists. It's your primary tool for finding files, searching text, browsing recent files, and more.
+
+## Features
+
+- Fuzzy finding with FZF algorithm (via fzf-native extension)
+- Live grep with ripgrep
+- File and text search
+- Recent files history
+- TODO comments integration
+- Keymap discovery
+
+## Keymaps
+
+All Telescope keymaps use the `<leader>` prefix (Space by default):
+
+| Keymap | Action | Description |
+|--------|--------|-------------|
+| `<leader><leader>` | Find Files | Fuzzy find files in current directory |
+| `<leader>fr` | Recent Files | Browse recently opened files |
+| `<leader>/` | Live Grep | Search for text in current directory |
+| `<leader>fc` | Grep String | Find word under cursor in directory |
+| `<leader>ft` | Find TODOs | Search for TODO comments |
+| `<leader>fk` | Find Keymaps | Browse all keymaps |
+
+### Within Telescope
+
+When Telescope is open, these keymaps are available:
+
+| Keymap | Mode | Action |
+|--------|------|--------|
+| `<C-k>` | Insert | Move to previous result |
+| `<C-j>` | Insert | Move to next result |
+| `<C-q>` | Insert | Send selected to quickfix list |
+
+## Configuration
+
+The Telescope configuration is located at `lua/leyland/plugins/telescope.lua`:
+
+```lua lua/leyland/plugins/telescope.lua
+return {
+  "nvim-telescope/telescope.nvim",
+  branch = "0.1.x",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    "nvim-tree/nvim-web-devicons",
+    "folke/todo-comments.nvim",
+  },
+  config = function()
+    local telescope = require("telescope")
+    local actions = require("telescope.actions")
+
+    telescope.setup({
+      defaults = {
+        path_display = { "filename_first" },
+        mappings = {
+          i = {
+            ["<C-k>"] = actions.move_selection_previous,
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+          },
+        },
+      },
+      pickers = {
+        live_grep = {
+          path_display = { "truncate" },
+        },
+      },
+    })
+
+    telescope.load_extension("fzf")
+  end,
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Finding Files">
+    Press `<leader><leader>` to open the file finder.
+    
+    ```
+    1. Press Space twice
+    2. Start typing the filename
+    3. Use Ctrl-j/k to navigate results
+    4. Press Enter to open the file
+    ```
+    
+    **Tips:**
+    - You don't need to type the full filename
+    - Type parts of the path: `src/utils` matches files in that directory
+    - Fuzzy matching means `plgs` will match `plugins`
+  </Tab>
+  
+  <Tab title="Searching Text">
+    Press `<leader>/` to search for text across your project.
+    
+    ```
+    1. Press Space + /
+    2. Type the text you want to find
+    3. See live results as you type
+    4. Navigate with Ctrl-j/k
+    5. Press Enter to jump to that location
+    ```
+    
+    **Tips:**
+    - Uses ripgrep under the hood (very fast)
+    - Respects .gitignore by default
+    - Search results show file path and line number
+  </Tab>
+  
+  <Tab title="Recent Files">
+    Press `<leader>fr` to see recently opened files.
+    
+    ```
+    1. Press Space + f + r
+    2. Browse your recent files
+    3. Type to filter the list
+    4. Press Enter to reopen a file
+    ```
+    
+    **Tips:**
+    - Great for switching between frequently used files
+    - Faster than Harpoon for ad-hoc file switching
+    - History persists across sessions
+  </Tab>
+  
+  <Tab title="Word Under Cursor">
+    Press `<leader>fc` to search for the word under cursor.
+    
+    ```
+    1. Place cursor on a word/variable
+    2. Press Space + f + c
+    3. See all occurrences across the project
+    ```
+    
+    **Tips:**
+    - Perfect for finding all usages of a function or variable
+    - Faster than LSP references for simple text search
+    - Works even without LSP configured
+  </Tab>
+  
+  <Tab title="Finding TODOs">
+    Press `<leader>ft` to search for TODO comments.
+    
+    ```
+    1. Press Space + f + t
+    2. Browse all TODO, FIXME, NOTE comments
+    3. Jump directly to any comment
+    ```
+    
+    Supported keywords:
+    - TODO
+    - FIXME
+    - HACK
+    - NOTE
+    - WARNING
+  </Tab>
+</Tabs>
+
+## Extensions
+
+### FZF Native
+
+The FZF native extension provides faster sorting and filtering using the FZF algorithm compiled in C.
+
+```lua
+telescope.load_extension("fzf")
+```
+
+This extension is automatically loaded in the configuration.
+
+### TODO Comments
+
+Integration with [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) provides the `:TodoTelescope` command and `<leader>ft` keymap.
+
+## Display Options
+
+### Path Display
+
+**Default pickers** use `filename_first` display:
+```
+config.lua  lua/leyland/core/config.lua
+```
+
+**Live grep** uses `truncate` display for longer paths:
+```
+...leyland/core/config.lua:42: local config = {...}
+```
+
+## Customization
+
+### Adding Custom Pickers
+
+You can add custom keymaps for additional Telescope pickers:
+
+```lua
+-- Find files including hidden files
+keymap.set("n", "<leader>fh", function()
+  require("telescope.builtin").find_files({ hidden = true })
+end, { desc = "Find hidden files" })
+
+-- Find in current buffer
+keymap.set("n", "<leader>fb", "<cmd>Telescope current_buffer_fuzzy_find<cr>")
+
+-- Git files only
+keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>")
+```
+
+### Customizing Appearance
+
+```lua
+telescope.setup({
+  defaults = {
+    layout_strategy = "horizontal",
+    layout_config = {
+      horizontal = {
+        preview_width = 0.6,
+      },
+    },
+    border = true,
+    borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+  },
+})
+```
+
+### Custom Ignore Patterns
+
+```lua
+telescope.setup({
+  defaults = {
+    file_ignore_patterns = {
+      "node_modules",
+      ".git/",
+      "dist/",
+      "build/",
+    },
+  },
+})
+```
+
+## Tips and Tricks
+
+1. **Multi-select**: Use `<Tab>` to select multiple files, then `<CR>` to open them all
+2. **Quickfix**: Use `<C-q>` to send results to quickfix list for batch operations
+3. **Preview scrolling**: Use `<C-u>` and `<C-d>` to scroll the preview window
+4. **Canceling**: Press `<Esc>` or `<C-c>` to close Telescope
+5. **Paste in search**: Use `<C-r>"` in insert mode to paste from clipboard
+
+## Troubleshooting
+
+### Slow File Searching
+
+- Ensure `fd` or `rg` is installed for faster file finding
+- Check if you're in a large directory (node_modules, etc.)
+- Add ignore patterns for large directories
+
+### No Results in Live Grep
+
+- Ensure `ripgrep` is installed: `rg --version`
+- Check if the text exists in non-ignored files
+- Try searching with different terms
+
+### FZF Extension Not Loading
+
+- Ensure you have `make` and a C compiler installed
+- Reinstall the extension: `:Lazy build telescope-fzf-native.nvim`

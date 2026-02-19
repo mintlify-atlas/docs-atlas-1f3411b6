@@ -1,0 +1,455 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for nvim-luffy
+---
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="Plugins not loading or errors on startup">
+    **Symptoms:**
+    - Error messages during Neovim startup
+    - Plugins not functioning
+    - Missing commands or keybindings
+
+    **Solutions:**
+
+    1. **Check lazy.nvim installation:**
+       ```vim
+       :Lazy
+       ```
+       If this command doesn't work, lazy.nvim isn't installed. Restart Neovim and it should auto-install.
+
+    2. **Sync plugins:**
+       ```vim
+       :Lazy sync
+       ```
+       This installs missing plugins and updates to locked versions.
+
+    3. **Check for error messages:**
+       ```vim
+       :messages
+       ```
+       Review startup errors for specific plugin issues.
+
+    4. **Clear plugin cache:**
+       ```bash
+       rm -rf ~/.local/share/nvim
+       rm -rf ~/.local/state/nvim
+       rm -rf ~/.cache/nvim
+       ```
+       Then restart Neovim and run `:Lazy sync`.
+  </Accordion>
+
+  <Accordion title="LSP not working or servers not starting">
+    **Symptoms:**
+    - No autocompletion
+    - No diagnostics or error highlighting
+    - LSP keybindings not working
+    - `:LspInfo` shows no attached clients
+
+    **Solutions:**
+
+    1. **Check if LSP server is installed:**
+       ```vim
+       :Mason
+       ```
+       Ensure your language server is installed. Install with `i` if missing.
+
+    2. **Verify LSP server is configured:**
+       Check `lua/leyland/plugins/lsp/lsp.lua` for your language server config.
+
+    3. **Check LSP status:**
+       ```vim
+       :LspInfo
+       ```
+       Shows attached clients and server status.
+
+    4. **Restart LSP server:**
+       ```vim
+       :LspRestart
+       ```
+
+    5. **Check LSP logs:**
+       ```vim
+       :LspLog
+       ```
+       Review for server-specific errors.
+
+    6. **Reinstall language server:**
+       ```vim
+       :Mason
+       ```
+       Press `X` to uninstall, then `i` to reinstall the server.
+
+    7. **Check file type detection:**
+       ```vim
+       :set filetype?
+       ```
+       LSP servers only attach to specific file types.
+  </Accordion>
+
+  <Accordion title="Treesitter syntax highlighting issues">
+    **Symptoms:**
+    - Incorrect or missing syntax highlighting
+    - Colors look broken
+    - Some languages not highlighted
+
+    **Solutions:**
+
+    1. **Check installed parsers:**
+       ```vim
+       :TSInstallInfo
+       ```
+       Shows all available and installed parsers.
+
+    2. **Install missing parser:**
+       ```vim
+       :TSInstall <language>
+       ```
+       Example: `:TSInstall python`
+
+    3. **Update all parsers:**
+       ```vim
+       :TSUpdate
+       ```
+
+    4. **Rebuild parsers:**
+       ```bash
+       rm -rf ~/.local/share/nvim/lazy/nvim-treesitter
+       ```
+       Then restart Neovim and run `:Lazy sync`
+
+    5. **Check treesitter status:**
+       ```vim
+       :TSModuleInfo
+       ```
+       Shows enabled modules and their status.
+  </Accordion>
+
+  <Accordion title="Telescope or fuzzy finder not working">
+    **Symptoms:**
+    - Telescope commands fail
+    - Search not working
+    - Preview window shows errors
+
+    **Solutions:**
+
+    1. **Check for required dependencies:**
+       - `ripgrep` for live grep: `sudo apt install ripgrep` or `brew install ripgrep`
+       - `fd` for file search: `sudo apt install fd-find` or `brew install fd`
+
+    2. **Rebuild fzf-native:**
+       ```bash
+       cd ~/.local/share/nvim/lazy/telescope-fzf-native.nvim
+       make
+       ```
+
+    3. **Check Telescope health:**
+       ```vim
+       :checkhealth telescope
+       ```
+
+    4. **Verify plenary.nvim is installed:**
+       ```vim
+       :Lazy
+       ```
+       Look for plenary.nvim in the plugin list.
+  </Accordion>
+
+  <Accordion title="Completion not showing or not working">
+    **Symptoms:**
+    - No completion menu appears
+    - Completion menu appears but is empty
+    - Snippets not expanding
+
+    **Solutions:**
+
+    1. **Check nvim-cmp is loaded:**
+       ```vim
+       :Lazy
+       ```
+       Find nvim-cmp and ensure it's loaded (not grayed out).
+
+    2. **Verify completion sources:**
+       Check that LSP is running (`:LspInfo`) for LSP completions.
+
+    3. **Test completion manually:**
+       - Type some text
+       - Press `<C-Space>` to trigger completion manually
+
+    4. **Check for conflicting mappings:**
+       ```vim
+       :map <Tab>
+       :imap <Tab>
+       ```
+       Look for conflicting keybindings.
+
+    5. **Verify LuaSnip is loaded:**
+       Snippets require LuaSnip to be installed and loaded.
+  </Accordion>
+
+  <Accordion title="Keybindings not working">
+    **Symptoms:**
+    - Expected keybinding does nothing
+    - Wrong action happens
+    - Leader key not working
+
+    **Solutions:**
+
+    1. **Check leader key:**
+       The leader key is set in `lua/leyland/core/options.lua`. Default is usually `<Space>`.
+
+    2. **Verify keymap exists:**
+       ```vim
+       :map <key>
+       ```
+       Shows what the key is mapped to.
+
+    3. **Check for conflicts:**
+       ```vim
+       :verbose map <key>
+       ```
+       Shows where the mapping was defined.
+
+    4. **Ensure plugin is loaded:**
+       Some keymaps only work after their plugin loads. Check with `:Lazy`.
+
+    5. **Check mode-specific mappings:**
+       - Normal mode: `:nmap <key>`
+       - Insert mode: `:imap <key>`
+       - Visual mode: `:vmap <key>`
+  </Accordion>
+
+  <Accordion title="Colorscheme not loading or looking wrong">
+    **Symptoms:**
+    - Wrong colors
+    - Colorscheme command fails
+    - Terminal colors look broken
+
+    **Solutions:**
+
+    1. **Verify colorscheme is installed:**
+       ```vim
+       :Lazy
+       ```
+       Check that your chosen theme plugin is installed.
+
+    2. **Check terminal true color support:**
+       Add to your shell config:
+       ```bash
+       export TERM=xterm-256color
+       ```
+       Or in `lua/leyland/core/options.lua`:
+       ```lua
+       vim.opt.termguicolors = true
+       ```
+
+    3. **Manually set colorscheme:**
+       ```vim
+       :colorscheme catppuccin
+       ```
+       Try different themes: `tokyonight`, `rose-pine`, `onedark`, `bamboo`, `modus`
+
+    4. **Check for conflicts:**
+       Only one colorscheme should be activated in `lua/leyland/plugins/colorscheme.lua`.
+  </Accordion>
+
+  <Accordion title="Git integration (Neogit/Diffview) not working">
+    **Symptoms:**
+    - Neogit command fails
+    - Git signs not showing
+    - Diffview errors
+
+    **Solutions:**
+
+    1. **Verify git is installed:**
+       ```bash
+       git --version
+       ```
+
+    2. **Check you're in a git repository:**
+       ```bash
+       git status
+       ```
+
+    3. **Verify plenary.nvim is installed:**
+       Both Neogit and Diffview depend on plenary.nvim.
+
+    4. **Check plugin status:**
+       ```vim
+       :Lazy
+       ```
+       Ensure neogit and diffview.nvim are loaded.
+
+    5. **Test commands:**
+       ```vim
+       :Neogit
+       :DiffviewOpen
+       ```
+  </Accordion>
+
+  <Accordion title="File explorer (nvim-tree) issues">
+    **Symptoms:**
+    - nvim-tree won't open
+    - Icons not showing
+    - File operations fail
+
+    **Solutions:**
+
+    1. **Check nvim-tree is loaded:**
+       ```vim
+       :Lazy
+       ```
+
+    2. **Verify icons plugin:**
+       nvim-web-devicons must be installed for icons.
+
+    3. **Check for conflicting file explorers:**
+       Disable netrw if enabled (should be in options.lua):
+       ```lua
+       vim.g.loaded_netrw = 1
+       vim.g.loaded_netrwPlugin = 1
+       ```
+
+    4. **Test command:**
+       ```vim
+       :NvimTreeToggle
+       ```
+
+    5. **Check for font support:**
+       Icons require a Nerd Font. Install from [nerdfonts.com](https://www.nerdfonts.com).
+  </Accordion>
+
+  <Accordion title="Performance issues or slow startup">
+    **Symptoms:**
+    - Neovim takes long to start
+    - Laggy typing or scrolling
+    - High CPU usage
+
+    **Solutions:**
+
+    1. **Profile startup time:**
+       ```bash
+       nvim --startuptime startup.log
+       ```
+       Review `startup.log` for slow plugins.
+
+    2. **Check lazy loading:**
+       Ensure plugins are lazy-loaded when possible in their config files.
+
+    3. **Disable heavy features temporarily:**
+       - Treesitter: `:TSDisable highlight`
+       - LSP: Don't open LSP-heavy files
+       - Identify the culprit
+
+    4. **Check for infinite loops in config:**
+       Review autocommands in `lua/leyland/core/autocommands.lua`.
+
+    5. **Update plugins:**
+       ```vim
+       :Lazy update
+       ```
+       Performance improvements may be in newer versions.
+
+    6. **Check system resources:**
+       ```bash
+       htop
+       ```
+       Ensure sufficient RAM and CPU available.
+  </Accordion>
+
+  <Accordion title="Mason tools not installing">
+    **Symptoms:**
+    - Installation fails in Mason
+    - Tools show as installed but don't work
+    - Error messages during installation
+
+    **Solutions:**
+
+    1. **Check Mason log:**
+       ```vim
+       :MasonLog
+       ```
+
+    2. **Verify network connectivity:**
+       Mason downloads tools from the internet.
+
+    3. **Check for required system dependencies:**
+       Some tools need build tools:
+       - Ubuntu/Debian: `sudo apt install build-essential`
+       - macOS: Install Xcode Command Line Tools
+
+    4. **Try manual installation:**
+       ```vim
+       :Mason
+       ```
+       Navigate to tool, press `i` to install.
+
+    5. **Clear Mason cache:**
+       ```bash
+       rm -rf ~/.local/share/nvim/mason
+       ```
+       Then run `:Mason` and reinstall tools.
+  </Accordion>
+</AccordionGroup>
+
+## Health Checks
+
+Neovim includes health check utilities:
+
+```vim
+:checkhealth
+```
+
+This runs diagnostics for all loaded plugins and Neovim itself. Review warnings and errors.
+
+For specific plugins:
+
+```vim
+:checkhealth telescope
+:checkhealth nvim-treesitter
+:checkhealth lspconfig
+```
+
+## Debug Mode
+
+To get more verbose output for debugging:
+
+```lua
+vim.lsp.set_log_level("debug")
+```
+
+Add this temporarily to `init.lua` and check `:LspLog`.
+
+## Getting Help
+
+If issues persist:
+
+1. **Check plugin documentation**: Each plugin has its own GitHub repository with docs
+2. **Search existing issues**: Look for similar problems on GitHub
+3. **Create a minimal config**: Test if the issue occurs with minimal configuration
+4. **Gather information**:
+   - Neovim version: `nvim --version`
+   - Plugin versions: `cat lazy-lock.json`
+   - Error messages: `:messages`
+   - System info: OS, terminal emulator
+
+## Reset Everything
+
+Last resort - complete reset:
+
+```bash
+# Backup your config
+cp -r ~/.config/nvim ~/.config/nvim.backup
+
+# Remove all Neovim data
+rm -rf ~/.local/share/nvim
+rm -rf ~/.local/state/nvim
+rm -rf ~/.cache/nvim
+
+# Restart Neovim
+nvim
+```
+
+Plugins will reinstall automatically. If this solves the issue, something in the cache or data directory was corrupted.

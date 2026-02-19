@@ -1,0 +1,209 @@
+---
+title: 'LSP Configuration'
+description: 'Language Server Protocol setup with Mason and nvim-lspconfig'
+icon: 'code'
+---
+
+## Overview
+
+nvim-luffy uses Mason to manage LSP servers and nvim-lspconfig for LSP configuration. The setup automatically installs configured language servers and integrates them with nvim-cmp for autocompletion.
+
+## Installation
+
+The LSP configuration is split across two files:
+- `lua/leyland/plugins/lsp/mason.lua` - Mason and server installation
+- `lua/leyland/plugins/lsp/lsp.lua` - LSP capabilities and configuration
+
+## Default LSP Servers
+
+The following language servers are installed by default:
+
+<CardGroup cols={2}>
+  <Card title="TypeScript/JavaScript" icon="js">
+    ts_ls, eslint
+  </Card>
+  <Card title="Web Development" icon="browser">
+    html, cssls, tailwindcss, emmet_ls
+  </Card>
+  <Card title="Frameworks" icon="react">
+    svelte, graphql, prismals
+  </Card>
+  <Card title="Other Languages" icon="code">
+    lua_ls, pyright
+  </Card>
+</CardGroup>
+
+## Configuration
+
+### Mason Setup
+
+From `lua/leyland/plugins/lsp/mason.lua:1`:
+
+```lua
+return {
+  {
+    "williamboman/mason-lspconfig.nvim",
+    opts = {
+      -- list of servers for mason to install
+      ensure_installed = {
+        "ts_ls",
+        "html",
+        "cssls",
+        "tailwindcss",
+        "svelte",
+        "lua_ls",
+        "graphql",
+        "emmet_ls",
+        "prismals",
+        "pyright",
+        "eslint",
+      },
+    },
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        opts = {
+          ui = {
+            icons = {
+              package_installed = "✓",
+              package_pending = "➜",
+              package_uninstalled = "✗",
+            },
+          },
+        },
+      },
+      "neovim/nvim-lspconfig",
+    },
+  },
+}
+```
+
+### LSP Capabilities
+
+From `lua/leyland/plugins/lsp/lsp.lua:1`:
+
+```lua
+return {
+  "hrsh7th/cmp-nvim-lsp",
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    { "antosha417/nvim-lsp-file-operations", config = true },
+    { "folke/lazydev.nvim", opts = {} },
+  },
+  config = function()
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    local capabilities = cmp_nvim_lsp.default_capabilities()
+
+    vim.lsp.config("*", {
+      capabilities = capabilities,
+    })
+  end,
+}
+```
+
+## Adding LSP Servers
+
+<Steps>
+  <Step title="Edit mason.lua">
+    Open `lua/leyland/plugins/lsp/mason.lua` and add your server to the `ensure_installed` list:
+
+    ```lua
+    ensure_installed = {
+      "ts_ls",
+      "html",
+      -- Add your server here
+      "gopls",  -- Example: Go language server
+    },
+    ```
+  </Step>
+
+  <Step title="Restart Neovim">
+    Restart Neovim or run `:Lazy sync` to install the new server.
+  </Step>
+
+  <Step title="Verify Installation">
+    Run `:Mason` to open the Mason UI and verify your server is installed.
+  </Step>
+</Steps>
+
+## Mason Commands
+
+| Command | Description |
+|---------|-------------|
+| `:Mason` | Open Mason UI to manage LSP servers |
+| `:MasonInstall <server>` | Install a specific LSP server |
+| `:MasonUninstall <server>` | Uninstall a specific LSP server |
+| `:MasonUpdate` | Update all installed packages |
+
+## Tool Installation
+
+Mason also installs formatters and linters via `mason-tool-installer`:
+
+From `lua/leyland/plugins/lsp/mason.lua:36`:
+
+```lua
+{
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  opts = {
+    ensure_installed = {
+      "prettier", -- prettier formatter
+      "stylua", -- lua formatter
+      "isort", -- python formatter
+      "black", -- python formatter
+      "pylint",
+      "eslint_d",
+    },
+  },
+  dependencies = {
+    "williamboman/mason.nvim",
+  },
+}
+```
+
+## Additional Features
+
+### File Operations
+
+The `nvim-lsp-file-operations` plugin automatically updates imports when you rename or move files in nvim-tree.
+
+### Lua Development
+
+The `lazydev.nvim` plugin provides proper LSP support for Neovim Lua API development.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I configure a specific LSP server?">
+    LSP servers are configured globally via `vim.lsp.config("*", {...})` in `lsp.lua`. For server-specific configuration, you can use:
+
+    ```lua
+    vim.lsp.config("lua_ls", {
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+        },
+      },
+    })
+    ```
+  </Accordion>
+
+  <Accordion title="How do I disable a specific LSP server?">
+    Remove it from the `ensure_installed` list in `mason.lua` and run `:MasonUninstall <server>`.
+  </Accordion>
+
+  <Accordion title="Where can I find available LSP servers?">
+    Visit the [nvim-lspconfig server configurations](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md) for a complete list.
+  </Accordion>
+
+  <Accordion title="How do I check if an LSP server is running?">
+    Use `:LspInfo` to see active LSP clients for the current buffer.
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [Completion](/plugins/completion) - Auto-completion configuration
+- [Formatting](/plugins/formatting) - Code formatting setup
+- [Keymaps](/configuration/keymaps) - LSP-related keybindings

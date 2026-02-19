@@ -1,0 +1,326 @@
+---
+title: Options
+description: Vim options and editor configuration
+---
+
+nvim-luffy configures various Vim options to provide a modern editing experience. All options are set in `lua/leyland/core/options.lua`.
+
+## Display Settings
+
+<Accordion title="Line Numbers">
+
+```lua
+vim.opt.number = true
+vim.opt.relativenumber = true
+```
+
+Enables both absolute and relative line numbers. The current line shows the absolute line number, while other lines show relative distances for easier motion commands.
+
+**Customization:**
+
+```lua
+-- Disable relative numbers
+vim.opt.relativenumber = false
+
+-- Disable line numbers entirely
+vim.opt.number = false
+```
+
+</Accordion>
+
+<Accordion title="Status and Command Line">
+
+```lua
+vim.opt.cmdheight = 0
+vim.opt.laststatus = 0
+vim.opt.winbar = "%f %h%m%r%=%l,%c %P"
+```
+
+- `cmdheight = 0`: Hides the command line when not in use
+- `laststatus = 0`: Hides the statusline
+- `winbar`: Displays file info in the window bar (filename, modified flag, line/column, position)
+
+**Customization:**
+
+```lua
+-- Show command line with 1 line height
+vim.opt.cmdheight = 1
+
+-- Show statusline always
+vim.opt.laststatus = 3  -- global statusline
+
+-- Custom winbar format
+vim.opt.winbar = "%f %m"  -- just filename and modified flag
+```
+
+</Accordion>
+
+<Accordion title="Color and Visual Settings">
+
+```lua
+vim.opt.background = "dark"
+vim.opt.signcolumn = "yes"
+```
+
+- `background = "dark"`: Sets dark mode for colorschemes
+- `signcolumn = "yes"`: Always shows the sign column to prevent text shifting
+
+**Customization:**
+
+```lua
+-- Light mode
+vim.opt.background = "light"
+
+-- Auto-hide sign column
+vim.opt.signcolumn = "auto"
+
+-- Enable cursor line highlight
+vim.opt.cursorline = true
+
+-- Enable true colors (commented out by default)
+vim.opt.termguicolors = true
+```
+
+</Accordion>
+
+## Indentation and Formatting
+
+<Accordion title="Tab and Indent Settings">
+
+```lua
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+vim.opt.autoindent = true
+```
+
+- `tabstop = 2`: Tab characters display as 2 spaces wide
+- `shiftwidth = 2`: Indent/outdent operations use 2 spaces
+- `expandtab = true`: Converts tabs to spaces
+- `autoindent = true`: Copies indent from current line when starting a new line
+
+**Customization:**
+
+```lua
+-- Use 4 spaces for indentation
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+
+-- Use actual tab characters
+vim.opt.expandtab = false
+
+-- Smart indentation
+vim.opt.smartindent = true
+```
+
+</Accordion>
+
+<Accordion title="Line Wrapping">
+
+```lua
+vim.opt.wrap = false
+```
+
+Disables line wrapping for long lines.
+
+**Customization:**
+
+```lua
+-- Enable line wrapping
+vim.opt.wrap = true
+
+-- Wrap at word boundaries
+vim.opt.linebreak = true
+```
+
+</Accordion>
+
+## Search Settings
+
+<Accordion title="Case Sensitivity">
+
+```lua
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+```
+
+- `ignorecase = true`: Makes searches case-insensitive by default
+- `smartcase = true`: Overrides `ignorecase` when search contains uppercase letters
+
+**Examples:**
+- `/hello` - matches "hello", "Hello", "HELLO"
+- `/Hello` - matches only "Hello" (case-sensitive due to uppercase)
+
+**Customization:**
+
+```lua
+-- Always case-sensitive search
+vim.opt.ignorecase = false
+vim.opt.smartcase = false
+
+-- Always case-insensitive search
+vim.opt.ignorecase = true
+vim.opt.smartcase = false
+```
+
+</Accordion>
+
+## File Management
+
+<Accordion title="Swap Files">
+
+```lua
+vim.opt.swapfile = false
+```
+
+Disables swap file creation. Swap files are used for crash recovery but can clutter directories.
+
+**Customization:**
+
+```lua
+-- Enable swap files
+vim.opt.swapfile = true
+
+-- Set custom swap directory
+vim.opt.directory = vim.fn.stdpath("data") .. "/swap//"
+```
+
+</Accordion>
+
+## Editing Behavior
+
+<Accordion title="Backspace">
+
+```lua
+vim.opt.backspace = "indent,eol,start"
+```
+
+Allows backspace to delete:
+- `indent`: Auto-indentation
+- `eol`: Line breaks (join lines)
+- `start`: Characters inserted before entering insert mode
+
+**Customization:**
+
+```lua
+-- Restrict backspace behavior
+vim.opt.backspace = "indent,eol"  -- can't delete past insert start
+```
+
+</Accordion>
+
+<Accordion title="Clipboard">
+
+```lua
+vim.opt.clipboard:append("unnamedplus")
+```
+
+Integrates Vim's default register with the system clipboard. Yank and paste operations use the system clipboard automatically.
+
+**Customization:**
+
+```lua
+-- Disable clipboard integration
+vim.opt.clipboard = ""
+
+-- Use different clipboard register
+vim.opt.clipboard = "unnamed"  -- use * register instead of +
+```
+
+</Accordion>
+
+## Window Splitting
+
+<Accordion title="Split Behavior">
+
+```lua
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+```
+
+- `splitright = true`: Vertical splits open to the right
+- `splitbelow = true`: Horizontal splits open below
+
+**Customization:**
+
+```lua
+-- Traditional Vim split behavior
+vim.opt.splitright = false  -- splits open left
+vim.opt.splitbelow = false  -- splits open above
+```
+
+</Accordion>
+
+## File Explorer
+
+<Accordion title="Netrw Configuration">
+
+```lua
+vim.cmd("let g:netrw_liststyle = 3")
+```
+
+Sets netrw (Vim's built-in file explorer) to tree view style.
+
+**Customization:**
+
+```lua
+-- Netrw list styles:
+-- 0: Thin listing (one file per line)
+-- 1: Long listing (with file size and time stamp)
+-- 2: Wide listing (multi-column)
+-- 3: Tree listing
+vim.g.netrw_liststyle = 0
+
+-- Additional netrw options
+vim.g.netrw_banner = 0  -- hide banner
+vim.g.netrw_browse_split = 4  -- open in previous window
+vim.g.netrw_winsize = 25  -- 25% width
+```
+
+</Accordion>
+
+## LSP Configuration
+
+<Accordion title="Log Level">
+
+```lua
+vim.lsp.set_log_level("error")
+```
+
+Sets LSP logging to only show errors, suppressing warnings and info messages.
+
+**Customization:**
+
+```lua
+-- Show all LSP messages
+vim.lsp.set_log_level("debug")
+
+-- Available levels: "trace", "debug", "info", "warn", "error", "off"
+vim.lsp.set_log_level("warn")
+```
+
+</Accordion>
+
+## Complete Configuration Example
+
+To override any of these settings, add them to your configuration after nvim-luffy loads:
+
+```lua
+-- In your init.lua or after nvim-luffy setup
+
+-- Change indentation to 4 spaces
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+
+-- Enable line wrapping
+vim.opt.wrap = true
+
+-- Show statusline
+vim.opt.laststatus = 3
+
+-- Enable cursor line
+vim.opt.cursorline = true
+
+-- Enable true colors
+vim.opt.termguicolors = true
+```
