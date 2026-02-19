@@ -1,11 +1,11 @@
 {
   "projectType": "general",
   "projectName": "nvim-luffy",
-  "projectDescription": "A modern, modular Neovim configuration with LSP, fuzzy finding, and developer-friendly keybindings",
+  "projectDescription": "A modern Neovim configuration inspired by One Piece with curated plugins and keymaps",
   "theme": "palm",
-  "primaryColor": "#e63946",
-  "lightColor": "#f77f00",
-  "darkColor": "#d62828",
+  "primaryColor": "#DC143C",
+  "lightColor": "#FFD700",
+  "darkColor": "#8B0000",
   "navigation": {
     "groups": [
       {
